@@ -1,0 +1,44 @@
+Name     supershadow ;
+PartNo   00 ;
+Date     16/01/2023 ;
+Revision 02 ;
+Designer George Foot ;
+Company  gfoot360 ;
+Assembly None ;
+Location None ;
+Device   g22v10 ;
+
+pin 1 = PHI0;
+
+/* inputs */
+pin 2 = SYNC;
+pin 3 = RWB;
+pin [ 4..11, 13..14 ] = [ A6..15 ];
+
+/* outputs */
+pin [ 15, 16, 17, 18, 19, 20, 21, 22 ] = [ RSHAD, WSHAD, !BEEB, !SRHI, !SRLO, !WE, A15_BEEB, RWB_BEEB ];
+
+/* intermediate */
+pin 23 = ZPSYNC;
+
+Field addrhi = [A15..A8];
+
+
+ZPSYNC = SYNC & addrhi:'h'00;
+
+[RSHAD,WSHAD].d = ZPSYNC & [A7,A6] # !ZPSYNC & [RSHAD,WSHAD];
+[RSHAD,WSHAD].ar = 'b'0;
+[RSHAD,WSHAD].sp = 'b'0;
+
+BEEB = RWB & !RSHAD # !RWB & !WSHAD;
+
+SRHI = !BEEB & A15;
+SRLO = !BEEB & !A15;
+
+WE = PHI0 & !RWB;
+
+A15_BEEB = A15 & BEEB;
+
+RWB_BEEB = RWB # !BEEB;
+
+

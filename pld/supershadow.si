@@ -1,0 +1,106 @@
+Name     supershadow;
+PartNo   00;
+Date     16/01/2023;
+Revision 02;
+Designer George Foot;
+Company  gfoot360;
+Assembly None;
+Location None;
+Device   g22v10;
+
+
+ORDER: PHI0, %1, SYNC, RWB, %1, addrhi, A7, A6, %2, ZPSYNC, %1, RSHAD, WSHAD, %1, BEEB, SRHI, SRLO, %1, WE, %1, RWB_BEEB, A15_BEEB;
+
+VECTORS:
+P 00 '00'00 0 11 000 0 00
+
+$msg "Non-shadow reads";
+0 01 '00'00 L LL HLL L HL
+C 01 '00'00 L LL HLL L HL
+0 01 'FF'11 L LL HLL L HH
+C 01 'FF'11 L LL HLL L HH
+
+$msg "Non-shadow writes";
+0 00 '00'00 L LL HLL L LL
+C 00 '00'00 L LL HLL L LL
+1 00 '00'00 L LL HLL H LL
+0 00 'FF'11 L LL HLL L LH
+C 00 'FF'11 L LL HLL L LH
+1 00 'FF'11 L LL HLL H LH
+
+$msg "Set up for shadow writes, normal reads";
+0 11 '00'01 H LL HLL L HL
+C 11 '00'01 H LH HLL L HL
+1 11 '00'01 H LH HLL L HL
+
+$msg "  Shadow writes, normal reads - reads";
+0 01 '00'00 L LH HLL L HL
+C 01 '00'00 L LH HLL L HL
+0 01 'FF'11 L LH HLL L HH
+C 01 'FF'11 L LH HLL L HH
+
+$msg "  Shadow writes, normal reads - writes";
+0 00 '00'00 L LH LLH L HL
+C 00 '00'00 L LH LLH L HL
+1 00 '00'00 L LH LLH H HL
+0 00 'FF'10 L LH LHL L HL
+C 00 'FF'10 L LH LHL L HL
+1 00 'FF'10 L LH LHL H HL
+
+$msg "Set up for shadow writes, shadow reads";
+0 11 '00'11 H LH HLL L HL
+C 11 '00'11 H HH LLH L HL
+1 11 '00'11 H HH LLH L HL
+
+$msg "  Shadow writes, shadow reads - reads";
+0 01 '00'00 L HH LLH L HL
+C 01 '00'00 L HH LLH L HL
+0 01 'FF'11 L HH LHL L HL
+C 01 'FF'11 L HH LHL L HL
+
+$msg "  Shadow writes, shadow reads - writes";
+0 00 '00'00 L HH LLH L HL
+C 00 '00'00 L HH LLH L HL
+1 00 '00'00 L HH LLH H HL
+0 00 'FF'10 L HH LHL L HL
+C 00 'FF'10 L HH LHL L HL
+1 00 'FF'10 L HH LHL H HL
+
+$msg "Set up for non-shadow writes, shadow reads";
+0 11 '00'10 H HH LLH L HL
+C 11 '00'10 H HL LLH L HL
+1 11 '00'10 H HL LLH L HL
+
+$msg "  Non-shadow writes, shadow reads - reads";
+0 01 '00'00 L HL LLH L HL
+C 01 '00'00 L HL LLH L HL
+0 01 'FF'11 L HL LHL L HL
+C 01 'FF'11 L HL LHL L HL
+
+$msg "  Non-shadow writes, shadow reads - writes";
+0 00 '00'00 L HL HLL L LL
+C 00 '00'00 L HL HLL L LL
+1 00 '00'00 L HL HLL H LL
+0 00 'FF'10 L HL HLL L LH
+C 00 'FF'10 L HL HLL L LH
+1 00 'FF'10 L HL HLL H LH
+
+$msg "Set up for non-shadow writes, non-shadow reads";
+0 11 '00'00 H HL LLH L HL
+C 11 '00'00 H LL HLL L HL
+1 11 '00'00 H LL HLL L HL
+
+$msg "  Non-shadow reads, non-shadow writes - reads";
+0 01 '00'00 L LL HLL L HL
+C 01 '00'00 L LL HLL L HL
+0 01 'FF'11 L LL HLL L HH
+C 01 'FF'11 L LL HLL L HH
+
+$msg "  Non-shadow reads, non-shadow writes - writes";
+0 00 '00'00 L LL HLL L LL
+C 00 '00'00 L LL HLL L LL
+1 00 '00'00 L LL HLL H LL
+0 00 'FF'11 L LL HLL L LH
+C 00 'FF'11 L LL HLL L LH
+1 00 'FF'11 L LL HLL H LH
+
