@@ -1,7 +1,7 @@
 Name     supershadow ;
 PartNo   00 ;
-Date     16/01/2023 ;
-Revision 02 ;
+Date     20/01/2023 ;
+Revision 03 ;
 Designer George Foot ;
 Company  gfoot360 ;
 Assembly None ;
@@ -19,18 +19,22 @@ pin [ 4..11, 13..14 ] = [ A6..15 ];
 pin [ 15, 16, 17, 18, 19, 20, 21, 22 ] = [ RSHAD, WSHAD, !BEEB, !SRHI, !SRLO, !WE, A15_BEEB, RWB_BEEB ];
 
 /* intermediate */
-pin 23 = ZPSYNC;
+pin 23 = NZP; /* nearly zero-page */
 
 Field addrhi = [A15..A8];
 
+NZP = addrhi:'h'0000 # addrhi:'h'0100;
 
-ZPSYNC = SYNC & addrhi:'h'00;
+stack = NZP & A8;
+zp = NZP & !A8;
 
-[RSHAD,WSHAD].d = ZPSYNC & [A7,A6] # !ZPSYNC & [RSHAD,WSHAD];
+zpsync = zp & SYNC;
+
+[RSHAD,WSHAD].d = zpsync & [A7,A6] # !zpsync & [RSHAD,WSHAD];
 [RSHAD,WSHAD].ar = 'b'0;
 [RSHAD,WSHAD].sp = 'b'0;
 
-BEEB = RWB & !RSHAD # !RWB & !WSHAD;
+BEEB = RWB & !RSHAD & !stack # !RWB & !WSHAD & !stack;
 
 SRHI = !BEEB & A15;
 SRLO = !BEEB & !A15;
