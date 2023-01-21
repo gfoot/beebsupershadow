@@ -40,5 +40,7 @@ and another glue logic IC to implement the simple bank switching protocol.
 This is untested so far.
 
 I've also patched BeebEm to add support for this mode, and that's what I've
-been using to test the code so far.
+been using to test the code so far.  If you have the tools to build it, you can get that here:
+https://github.com/gfoot/beebem-windows/tree/supershadow
+
 
