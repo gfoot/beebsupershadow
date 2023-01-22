@@ -1,6 +1,6 @@
-; OSFILE handling
+; OSFIND handling
 ;
-; OSFILE passes args in A, X, and Y.  We need to put something else in A, so have to
+; OSFIND passes args in A, X, and Y.  We need to put something else in A, so have to
 ; store the old value on the stack.
 ;
 ; For operations involving a filename, that needs to be copied across.
