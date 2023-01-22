@@ -5,25 +5,8 @@
 
 clihandler:
 .(
-	stx srcptr : sty srcptr+1
-	lda #<normal_inbuffer : sta destptr
-	lda #>normal_inbuffer : sta destptr+1
+	jsr copy_xy_string_to_normal
 
-	ldy #0
-loop:
-	lda (srcptr),y
-	cmp #13
-	beq foundcr
-	iny
-	bne loop
-
-	brk
-	.byte 1, "Bad string", 0
-
-foundcr:
-	iny
-	jsr copy_to_normal
-	
 	lda #CMD_OSCLI
 	jmp normal_command
 .)

@@ -10,9 +10,7 @@ gsreadhandler:
 ; More unsupported stuff at the moment
 
 filehandler:
-argshandler:
 gbpbhandler:
-findhandler:
 fschandler:
     jmp unsupported
 

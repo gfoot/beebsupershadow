@@ -58,12 +58,49 @@ do_cli:
     jsr oscli
     jmp shadow_rts
 
-do_file:
-do_args:
-do_gbpb:
 do_find:
+	; Restore original A from the stack.
+	; X is either irrelevant or zero at this point, so doesn't need saving.
+	tsx : lda $0103,x
+	ldx #0
+	jsr osfind
+	jmp shadow_rts
+
+do_args:
+	jmp do_args_impl
+
+do_file:
+do_gbpb:
 do_fsc:
     jmp unsupported
+
+
+do_args_impl:
+.(
+	; Copy data word from $0100 into zero page
+	ldx #3
+loop:
+	lda $0100,x : sta zpbuffer,x
+	dex : bpl loop
+
+	; Call OSARGS
+	ldx #<zpbuffer
+	lda $0104
+	jsr osargs
+
+	pha
+
+	; Copy data word back
+	ldx #3
+loop2:
+	lda zpbuffer,x : sta $0100,x
+	dex : bpl loop2
+
+	pla
+	jmp shadow_rts
+.)
+
+
 .)
 
 
