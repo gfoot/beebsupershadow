@@ -2,10 +2,16 @@
 
 shadow_osbyte:
 .(
+	cmp #$82 : beq shadow_osbyte82
     cmp #$83 : beq shadow_osbyte83
     cmp #$84 : beq shadow_osbyte8485
 	cmp #$85 : beq shadow_osbyte8485
     jmp normal_osbyte
+
+shadow_osbyte82:
+	ldx #0
+	ldy #0
+	rts
 
 shadow_osbyte83:
     ldx #<oshwm
