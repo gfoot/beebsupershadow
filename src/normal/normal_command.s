@@ -9,11 +9,11 @@
     cmp #CMD_RESET    : beq do_reset
     cmp #CMD_INIT     : beq do_init
     cmp #CMD_CALL     : beq do_call
-    cmp #CMD_CLI      : beq do_cli
-    cmp #CMD_FILE     : beq do_file
-    cmp #CMD_ARGS     : beq do_args
-    cmp #CMD_GBPB     : beq do_gbpb
-    cmp #CMD_FIND     : beq do_find
+    cmp #CMD_OSCLI    : beq do_cli
+    cmp #CMD_OSFILE   : beq do_file
+    cmp #CMD_OSARGS   : beq do_args
+    cmp #CMD_OSGBPB   : beq do_gbpb
+    cmp #CMD_OSFIND   : beq do_find
     cmp #CMD_FSC      : beq do_fsc
     
     brk

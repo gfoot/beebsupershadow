@@ -9,11 +9,11 @@ CMD_INIT = 5
 CMD_CALL = 6
 CMD_OSWORD00 = 7
 
-CMD_CLI = $ff
-CMD_FILE = $fe
-CMD_ARGS = $fd
-CMD_GBPB = $fc
-CMD_FIND = $fb
+CMD_OSCLI = $ff
+CMD_OSFILE = $fe
+CMD_OSARGS = $fd
+CMD_OSGBPB = $fc
+CMD_OSFIND = $fb
 CMD_FSC = $fa
 
 

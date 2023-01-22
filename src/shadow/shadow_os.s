@@ -22,6 +22,7 @@ shadow_code_dest:
 #include "common/utils.s"
 #include "shadow/shadow_test.s"
 #include "shadow/shadow_osbyte.s"
+#include "shadow/shadow_oscli.s"
 
 ; The vectors file must be last
 #include "shadow/shadow_vectors.s"

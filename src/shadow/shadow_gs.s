@@ -9,7 +9,6 @@ gsreadhandler:
 
 ; More unsupported stuff at the moment
 
-clihandler:
 filehandler:
 argshandler:
 gbpbhandler:
