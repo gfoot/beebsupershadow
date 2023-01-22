@@ -23,6 +23,7 @@ shadow_code_dest:
 #include "shadow/shadow_test.s"
 #include "shadow/shadow_osbyte.s"
 #include "shadow/shadow_oscli.s"
+#include "shadow/shadow_osfile.s"
 #include "shadow/shadow_osfind.s"
 #include "shadow/shadow_osargs.s"
 

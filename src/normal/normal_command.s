@@ -58,6 +58,15 @@ do_cli:
     jsr oscli
     jmp shadow_rts
 
+do_file:
+	jmp do_file_impl
+
+do_args:
+	jmp do_args_impl
+
+do_gbpb:
+    jmp unsupported
+
 do_find:
 	; Restore original A from the stack.
 	; X is either irrelevant or zero at this point, so doesn't need saving.
@@ -66,13 +75,28 @@ do_find:
 	jsr osfind
 	jmp shadow_rts
 
-do_args:
-	jmp do_args_impl
-
-do_file:
-do_gbpb:
 do_fsc:
     jmp unsupported
+
+
+do_file_impl:
+.(
+	; Get the operation code from the stack
+	; It's above the return address and shadow XY values
+	tsx
+	lda $0105,x
+	
+	; Set the filename pointer in the stacked parameter block to point to the inbuffer
+	ldx #<normal_inbuffer : stx $0100
+	ldx #>normal_inbuffer : stx $0101
+
+	; Set XY to point to the stacked parameter block and call OSFILE
+	ldx #$00 : ldy #$01
+	jsr osfile
+
+	; Return to shadow mode
+	jmp shadow_rts
+.)
 
 
 do_args_impl:
