@@ -3,7 +3,8 @@
 shadow_osbyte:
 .(
     cmp #$83 : beq shadow_osbyte83
-    cmp #$84 : beq shadow_osbyte84
+    cmp #$84 : beq shadow_osbyte8485
+	cmp #$85 : beq shadow_osbyte8485
     jmp normal_osbyte
 
 shadow_osbyte83:
@@ -11,9 +12,9 @@ shadow_osbyte83:
     ldy #>oshwm
     rts
 
-shadow_osbyte84:
-    ldx #<memtop
-    ldy #>memtop
+shadow_osbyte8485:
+    ldx memtop
+    ldy memtop+1
     rts
 .)
 

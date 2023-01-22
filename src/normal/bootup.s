@@ -33,7 +33,7 @@ init:
     .byte "SuperShadow starting", 13, 0
 
     jsr printimm
-    .byte "Normal stubs", 13, 0
+    .byte "Installing normal stubs", 13, 0
 
 	; Copy the normal mode entry points into zero page, so that 
 	; shadow code can use them to trigger normal code to run
@@ -50,7 +50,7 @@ loop:
 	sta `normal_read_shadow_write
 
     jsr printimm
-    .byte "Shadow stubs", 13, 0
+    .byte "Installing shadow stubs", 13, 0
 
 	; Copy the shadow stubs into shadow zero page ready for use
 	lda #<shadow_stubs_source : sta $0
@@ -61,7 +61,7 @@ loop:
 	jsr copy_to_shadow
 
     jsr printimm
-    .byte "Shadow OS ", 0
+    .byte "Uploading shadow OS ", 0
 
 	; Copy the main shadow code image to shadow memory
 	lda #<shadow_code_source : sta $0
@@ -72,7 +72,6 @@ loop:
 	ldx #>(shadow_code_size+255)
 	ldy #<shadow_code_size
 
-
 loop2:
 	jsr copy_to_shadow
 	inc $1 : inc $3	
@@ -82,24 +81,116 @@ loop2:
 
     jsr osnewl
 	
+	jsr printimm
+	.byte "Loading language image ", 0
+
+	lda #<language_filename : sta print_ptr
+	lda #>language_filename : sta print_ptr+1
+	jsr print
+
+	jsr loadlanguage
+
+	jsr getrelocaddress
+
+	jsr printimm
+	.byte "Uploading to shadow RAM at &", 0
+
+	lda $7 : jsr printhex
+	lda $6 : jsr printhex
+	jsr osnewl
+
+	jsr uploadlanguage
+
     jsr printimm
-    .byte "Initialising", 13, 0
+    .byte "Initialising shadow OS", 13, 0
 
 	; Send the initialisation command
 	lda #SCMD_INIT
 	jsr shadow_command
 
-    jsr printimm
-    .byte "Done", 13, 0
+	; Install the BRK handler here as we're about to enter a language
+	lda #<normal_brkhandler : sta brkv
+	lda #>normal_brkhandler : sta brkv+1
 
-    ; We can't really carry on as we've corrupted BASIC's zero page, so re-enter it to
-    ; let it reinitialise everything
+	lda #SCMD_ENTERLANG
+	ldx $6
+	ldy $7
+	jsr shadow_command
+
+    ; If it returns somehow, we can't really carry on as we've corrupted BASIC's 
+	; zero page, so re-enter it to let it reinitialise everything
     ldx #<cmd_basic
     ldy #>cmd_basic
     jmp oscli
 
 cmd_basic:
     .byte "BASIC", 13
+
+
+loadlanguage:
+.(
+	lda #$ff
+	ldx #<osfileparams
+	ldy #>osfileparams
+	jmp osfile
+
+osfileparams:
+	.word language_filename
+	.word languageimg, 0 ; load address
+	.word 0, 0
+	.word 0, 0
+	.word 0, 0
+.)
+
+language_filename:
+	.byte "HIBAS3", 13, 0
+
+languageimg = $3000
+
+
+getrelocaddress:
+.(
+	; The default base address for a language ROM is $8000
+	lda #$00 : sta $6
+	lda #$80 : sta $7
+
+	; Byte 6 bit 6 indicates whether the language has a relocation address
+	lda #$20 : bit languageimg+6 : beq noreloc
+
+	; Byte 7 is the offset to a zero byte before the copyright string
+	; The copyright string is followed by another zero byte, and then
+	; the relocation target address
+	ldy languageimg+7
+skiptonextzeroloop:
+	iny : lda languageimg,y : bne skiptonextzeroloop
+	iny ; skip the zero
+
+	; Copy out the relocation address
+	lda languageimg,y : sta $6
+	lda languageimg+1,y : sta $7
+
+noreloc:
+	rts
+.)
+
+
+uploadlanguage:
+.(
+	lda #<languageimg : sta $0
+	lda #>languageimg : sta $1
+	lda $6 : sta $2
+	lda $7 : sta $3
+
+	ldx #$40
+copyloop:
+	ldy #0 : jsr copy_to_shadow
+	inc $1 : inc $3
+	dex : bne copyloop
+
+	rts
+.)
+
+
 .)
 
 

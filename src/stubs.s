@@ -42,6 +42,10 @@ shadow_rtnmi:
 shadow_rti:
     rti
 
+; Execute shadow BRKV
+shadow_brk:
+	jmp shadow_brkhandler_impl
+
 shadow_stubs_size = *-shadow_stubs_dest
 * = shadow_stubs_source + shadow_stubs_size
 

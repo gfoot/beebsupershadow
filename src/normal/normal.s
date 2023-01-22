@@ -10,6 +10,7 @@
 #include "normal/normal_command.s"
 #include "normal/normal_cmd_osword.s"
 #include "common/utils.s"
+#include "normal/normal_brk.s"
 
 .)
 

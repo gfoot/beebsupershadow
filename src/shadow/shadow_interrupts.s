@@ -27,14 +27,22 @@ brkhandler:
     lda $0103,x
     sta srcptr+1
 
-    ; The first byte should be the error number, then the message - copy it all to the
-    ; bottom of the stack page, with a BRK instruction first
+    ; srcptr points at the error message; it's preceded by the error number and the BRK 
+	; instruction.  Copy all of it to the bottom of the stack page
 
+	; BRK instruction
     ldy #0
-    sty $0100    
-    lda (srcptr),y : sta $0101,y
+    sty $0100
+
+	lda srcptr
+	bne srcptrnotzero
+	dec srcptr+1
+srcptrnotzero:
+	dec srcptr
+
+	dey ; to $ff
 loop:
-    iny
+    iny ; 0, 1, 2, etc
     lda (srcptr),y : sta $0101,y
     bne loop
 
@@ -43,5 +51,19 @@ loop:
     txs
 
     jmp normal_brk
+.)
+
+
+; This one's a bit different - all BRKs are routed through normal mode, but if we started
+; a language already then they are forwarded back here again.
+;
+; YYXX points at the error code, which will be on the stack, followed by the error 
+; message.  All we do is store it at $fd/$fe where BASIC expects it, and chain to 
+; its brk handler.
+&shadow_brkhandler_impl:
+.(
+	stx brkptr
+	sty brkptr+1
+	jmp (brkv)
 .)
 

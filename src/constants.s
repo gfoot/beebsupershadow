@@ -21,6 +21,8 @@ CMD_FSC = $fa
 ; Normal-to-shadow command codes
 
 SCMD_INIT = 0
+SCMD_CALL = 1
+SCMD_ENTERLANG = 2
 
 
 ; Buffers for shadow-to-normal transfers

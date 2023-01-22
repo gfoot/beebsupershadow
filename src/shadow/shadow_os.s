@@ -10,7 +10,6 @@ shadow_code_source:
 shadow_code_dest:
 
 .(
-memtop:
 
 #include "shadow/shadow_constants.s"
 #include "shadow/shadow_command.s"

@@ -2,10 +2,14 @@ shadow_init:
 .(
     jsr initvectors
 
-    jsr printimm
-    .byte "Shadow OS prototype active", 13, 0
+	; Default memtop - will be reduced when a language is loaded
+	lda #$00 : sta memtop
+	lda #$f8 : sta memtop+1
 
-    jsr shadow_test
+    jsr printimm
+    .byte 13, "SuperShadow OS 64K", 13, 13, 0
+
+    ;jsr shadow_test
 
     jmp normal_rts
 .)

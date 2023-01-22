@@ -2,7 +2,10 @@
 print:
 .(
 	pha
+	txa : pha
+	ldx #0
 	jsr printloop
+	pla : tax
 	pla
 	rts
 
