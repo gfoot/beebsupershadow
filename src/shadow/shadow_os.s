@@ -26,6 +26,7 @@ shadow_code_dest:
 #include "shadow/shadow_osfile.s"
 #include "shadow/shadow_osfind.s"
 #include "shadow/shadow_osargs.s"
+#include "shadow/shadow_osgbpb.s"
 
 ; The vectors file must be last
 #include "shadow/shadow_vectors.s"

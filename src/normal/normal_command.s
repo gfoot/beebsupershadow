@@ -65,7 +65,7 @@ do_args:
 	jmp do_args_impl
 
 do_gbpb:
-    jmp unsupported
+	jmp do_gbpb_impl
 
 do_find:
 	; Restore original A from the stack.
@@ -121,6 +121,22 @@ loop2:
 	dex : bpl loop2
 
 	pla
+	jmp shadow_rts
+.)
+
+
+do_gbpb_impl:
+.(
+	; Get the operation code from the stack
+	; It's above the return address and shadow XY values
+	tsx
+	lda $0105,x
+	
+	; Set XY to point to the stacked parameter block and call OSGBPB
+	ldx #$00 : ldy #$01
+	jsr osgbpb
+
+	; Return to shadow mode
 	jmp shadow_rts
 .)
 
