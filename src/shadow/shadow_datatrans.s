@@ -7,7 +7,12 @@
 
 &shadow_data_setaddr_impl:
 .(
-	; If it's 2 or greater, we want to disable the routines
+	pha
+
+	stx srcptr
+	sty srcptr+1
+
+	; If it's 2 or greater, we want to disable the data transfer routines
 	cmp #2 : bcc ok
 
 	; Clamp it to 2, which will be a jmp instruction, and set X and Y so it's a "jmp normal_rts"
@@ -23,12 +28,26 @@ ok:
 	lda instrs,x
 	sta shadow_data_byte_impl
 
+	pla
+
+	; If it's mode 4, we need to execute at the provided address.  We still disable the data transfer
+	; system above, just now do the execute as well.
+	cmp #4
+	bne return
+	jsr execute
+
+return:
 	jmp normal_rts
+
+execute:
+	lda #1
+	jmp (srcptr)
 
 instrs:
 	.byte $ad ; lda absolute
 	.byte $8d ; sta absolute
 	.byte $4c ; jmp absolute
+
 .)
 
 

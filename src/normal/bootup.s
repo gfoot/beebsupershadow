@@ -138,10 +138,12 @@ datatrans_setaddr:
 .(
 	stx srcptr : sty srcptr+1
 
-	; We only support modes 0 and 1; also want to stop on claim/release
+	; We only support modes 0, 1 and 4; also want to stop on claim/release
 	; So don't try to poke around inside the data block for other modes
-	cmp #2 : bcs call_shadow_data_setaddr
+	cmp #2 : bcc readaddr
+	cmp #4 : bne call_shadow_data_setaddr
 
+readaddr:
 	pha
 
 	ldy #0
