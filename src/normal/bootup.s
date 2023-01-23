@@ -90,26 +90,6 @@ loop2:
 
     jsr osnewl
 	
-	jsr printimm
-	.byte "Loading language image ", 0
-
-	lda #<language_filename : sta print_ptr
-	lda #>language_filename : sta print_ptr+1
-	jsr print
-
-	jsr loadlanguage
-
-	jsr getrelocaddress
-
-	jsr printimm
-	.byte "Uploading to shadow RAM at &", 0
-
-	lda langaddr+1 : jsr printhex
-	lda langaddr : jsr printhex
-	jsr osnewl
-
-	jsr uploadlanguage
-
     jsr printimm
     .byte "Initialising shadow OS", 13, 0
 
@@ -117,13 +97,25 @@ loop2:
 	lda #SCMD_INIT
 	jsr shadow_command
 
-	; Install the BRK handler here as we're about to enter a language
+	; Install the BRK handler as the shadow OS is ready for it now
 	lda #<normal_brkhandler : sta brkv
 	lda #>normal_brkhandler : sta brkv+1
 
+	jsr printimm
+	.byte "Loading language image ", 0
+
+	lda #<language_filename : sta print_ptr
+	lda #>language_filename : sta print_ptr+1
+	jsr print
+
+	lda #$ff
+	ldx #<osfileparams
+	ldy #>osfileparams
+	jsr osfile
+
 	lda #SCMD_ENTERLANG
-	ldx langaddr
-	ldy langaddr+1
+	ldx osfileparams+2
+	ldy osfileparams+3
 	jsr shadow_command
 
     ; If it returns somehow, we can't really carry on as we've corrupted BASIC's 
@@ -135,70 +127,15 @@ loop2:
 cmd_basic:
     .byte "BASIC", 13
 
-
-loadlanguage:
-.(
-	lda #$ff
-	ldx #<osfileparams
-	ldy #>osfileparams
-	jmp osfile
-
 osfileparams:
 	.word language_filename
-	.word languageimg, $ffff ; load address
+	.word 0, 0 ; load address
+	.word 1, 0 ; exec address
 	.word 0, 0
 	.word 0, 0
-	.word 0, 0
-.)
 
 language_filename:
 	.byte "HIBAS3", 13, 0
-
-languageimg = $3000
-
-
-getrelocaddress:
-.(
-	; The default base address for a language ROM is $8000
-	lda #$00 : sta langaddr
-	lda #$80 : sta langaddr+1
-
-	; Byte 6 bit 6 indicates whether the language has a relocation address
-	lda #$20 : bit languageimg+6 : beq noreloc
-
-	; Byte 7 is the offset to a zero byte before the copyright string
-	; The copyright string is followed by another zero byte, and then
-	; the relocation target address
-	ldy languageimg+7
-skiptonextzeroloop:
-	iny : lda languageimg,y : bne skiptonextzeroloop
-	iny ; skip the zero
-
-	; Copy out the relocation address
-	lda languageimg,y : sta langaddr
-	lda languageimg+1,y : sta langaddr+1
-
-noreloc:
-	rts
-.)
-
-
-uploadlanguage:
-.(
-	lda #<languageimg : sta srcptr
-	lda #>languageimg : sta srcptr+1
-	lda langaddr : sta destptr
-	lda langaddr+1 : sta destptr+1
-
-	ldx #$40
-copyloop:
-	ldy #0 : jsr copy_to_shadow
-	inc srcptr+1 : inc destptr+1
-	dex : bne copyloop
-
-	rts
-.)
-
 
 .)
 
