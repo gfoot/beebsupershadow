@@ -20,6 +20,10 @@ shadow_read_normal_write_rti:
 
 ; The address at this point should be $C0
 
+; Data transfers - read or write a byte
+shadow_data_byte:
+	jmp shadow_data_byte_impl
+
 ; Main shadow entry point from normal mode
 ; A = command code, X,Y = parameters
 shadow_command:
@@ -50,12 +54,11 @@ shadow_brk:
 shadow_data_setaddr:
 	jmp shadow_data_setaddr_impl
 
-; Data transfers - read or write a byte
-shadow_data_byte:
-	jmp shadow_data_byte_impl
+shadow_stubs_end = *
 
-shadow_stubs_size = *-shadow_stubs_dest
+shadow_stubs_size = shadow_stubs_end-shadow_stubs_dest
 * = shadow_stubs_source + shadow_stubs_size
+shadow_stubs_source_end:
 
 
 ; The normal stubs are copied to $20-$3f and must not extend to $40 or beyond
@@ -109,10 +112,11 @@ normal_command:
 normal_rts:
 	rts
 
+normal_stubs_end = *
 
-normal_stubs_size = *-normal_stubs_dest
+normal_stubs_size = normal_stubs_end-normal_stubs_dest
 	* = normal_stubs_source + normal_stubs_size
-
+normal_stubs_source_end:
 
 ; Routine to switch into the special mode where reads come from normal memory but
 ; writes go to shadow memory.  It just contains an RTS (initialized on bootup).

@@ -1,4 +1,4 @@
-copy_to_shadow:
+&copy_to_shadow:
 .(
 	; Copy Y bytes of data (up to 256, pass Y=0 for 256)
 	; from normal memory pointed at by $00/$01

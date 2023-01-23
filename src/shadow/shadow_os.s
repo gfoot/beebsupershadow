@@ -35,4 +35,6 @@ shadow_code_dest:
 .)
 
 shadow_code_size = *-shadow_code_dest
+* = shadow_code_source + shadow_code_size
+shadow_code_source_end:
 

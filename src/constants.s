@@ -5,7 +5,6 @@ CMD_BGET = 1
 CMD_RDCH = 2
 CMD_VDUCHR = 3
 CMD_RESET = 4
-CMD_INIT = 5
 CMD_CALL = 6
 CMD_OSWORD00 = 7
 
@@ -25,8 +24,11 @@ SCMD_CALL = 1
 SCMD_ENTERLANG = 2
 
 
+; Lowest ZP location used for shadow variables
+shadow_zpvars = $e0
+
 ; Buffers for shadow-to-normal transfers
-normal_inbuffer = $500
+normal_inbuffer = $700
 
 ; Buffers for normal-to-shadow transfers
 shadow_inbuffer = $300

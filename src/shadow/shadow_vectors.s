@@ -7,13 +7,30 @@ loop:
     sta $01ff,x
     dex
     bne loop
+&rts_statement:
     rts
+.)
+
+default_brk:
+.(
+	jsr osnewl
+	ldy #1
+loop:
+	lda ($fd),y
+	beq loopend
+	jsr oswrch
+	iny
+	bne loop
+loopend:
+	jsr osnewl
+loop2:
+	jmp loop2
 .)
 
 
 defaultvectors:
     .word unsupported       ; userv
-    .word unsupported       ; brkv
+    .word default_brk
     .word unsupported       ; irq1v
     .word unsupported       ; irq2v
     .word clihandler
@@ -28,7 +45,7 @@ defaultvectors:
     .word gbpbhandler
     .word findhandler
     .word fschandler
-    .word unsupported       ; evntv
+    .word rts_statement     ; evntv
     .word unsupported       ; uptv
     .word unsupported       ; netv
     .word unsupported       ; vduv
@@ -42,7 +59,7 @@ defaultvectors:
 defaultvectors_size = *-defaultvectors
 
 
-shadowos_top
+&shadowos_top
     .dsb $ffb9-*, $00      ; pad to vectors
 #print *-shadowos_top
 

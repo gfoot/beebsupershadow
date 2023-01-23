@@ -7,7 +7,6 @@
     cmp #CMD_RDCH     : beq do_rdch
     cmp #CMD_VDUCHR   : beq do_vduchr
     cmp #CMD_RESET    : beq do_reset
-    cmp #CMD_INIT     : beq do_init
     cmp #CMD_CALL     : beq do_call
     cmp #CMD_OSCLI    : beq do_cli
     cmp #CMD_OSFILE   : beq do_file
@@ -39,9 +38,6 @@ do_vduchr:
 
 do_reset:
     jmp ($fffc)
-
-do_init:
-    jmp init
 
 do_call:
 .(

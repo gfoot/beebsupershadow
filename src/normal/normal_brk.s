@@ -13,7 +13,7 @@
 ; easy place to do that, but note that it's possible that the message is already
 ; on the stack as some sideways ROMs use it for a similar purpose.
 
-normal_brkhandler:
+&normal_brkhandler:
 .(
 	; At this point FD/FE point at the error number - see if it's on the stack
 	ldy $fe

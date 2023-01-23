@@ -2,6 +2,7 @@
 
 ; This is where this bootstrap code loads and executes in normal memory
 * = $2000
+loadaddr:
 
 #include "constants.s"
 
@@ -15,3 +16,7 @@
 ; calls through to normal mode, along with interrupts
 #include "shadow/shadow_os.s"
 
+; Check some values make sense
+#include "asserts.s"
+
+loadend:

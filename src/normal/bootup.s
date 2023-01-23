@@ -26,11 +26,20 @@
 
 
 
-init:
-#print init
+execaddr:
 .(
     jsr printimm
     .byte "SuperShadow starting", 13, 0
+
+	; Relocate the long-term normal mode host code into the language workspace
+	ldy #0
+loop3:
+	lda lang_ws_source,y : sta lang_ws_dest,y
+	lda lang_ws_source+$100,y : sta lang_ws_dest+$100,y
+	lda lang_ws_source+$200,y : sta lang_ws_dest+$200,y
+	; (the remaining page is just a buffer and doesn't need initialising)
+	iny
+	bne loop3
 
     jsr printimm
     .byte "Installing normal stubs", 13, 0
@@ -108,12 +117,6 @@ loop2:
 	lda #SCMD_INIT
 	jsr shadow_command
 
-	; Copy a jmp instruction to $0406 - the Tube Host entry point - so that whenever it's called it
-	; sets the shadow address of any future data transfer operations
-	lda #$4c : sta $0406   ; jmp absolute
-	lda #<datatrans_setaddr : sta $0407
-	lda #>datatrans_setaddr : sta $0408
-
 	; Install the BRK handler here as we're about to enter a language
 	lda #<normal_brkhandler : sta brkv
 	lda #>normal_brkhandler : sta brkv+1
@@ -132,33 +135,6 @@ loop2:
 cmd_basic:
     .byte "BASIC", 13
 
-
-; Look up the actual target address, put it in X and Y, and call shadow mode to store it
-datatrans_setaddr:
-.(
-	stx srcptr : sty srcptr+1
-
-	; We only support modes 0, 1 and 4; also want to stop on claim/release
-	; So don't try to poke around inside the data block for other modes
-	cmp #2 : bcc readaddr
-	cmp #4 : bne call_shadow_data_setaddr
-
-readaddr:
-	pha
-
-	ldy #0
-	lda (srcptr),y : tax
-	iny
-	lda (srcptr),y : tay
-
-	pla
-
-call_shadow_data_setaddr:
-	jsr shadow_data_setaddr
-
-	ldx srcptr : ldy srcptr+1
-	rts
-.)
 
 loadlanguage:
 .(
@@ -225,18 +201,4 @@ copyloop:
 
 
 .)
-
-
-normal_call_yyxx_impl:
-.(
-	stx jsr_instr + 1
-	sty jsr_instr + 2
-
-jsr_instr:
-	jsr $1234
-
-	; Switch back to shadow mode and return
-	jmp shadow_rts
-.)
-
 
