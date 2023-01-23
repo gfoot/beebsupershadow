@@ -10,7 +10,8 @@ def patch(data, addr, oldbytes, newbytes):
 	data[offset:offset+len(newbytes)] = newbytes
 
 # Patch the call to OSWORD EA (check Tube presence) and make it just set X to 0xff instead
-patch(data, 0xb469, [0x20, 0xa6, 0xb9], [0xea, 0xa2, 0xff])   # nop : ldx #$ff
+# We don't do this any more - instead we set the "Tube present" flag in the OS
+#patch(data, 0xb469, [0x20, 0xa6, 0xb9], [0xea, 0xa2, 0xff])   # nop : ldx #$ff
 
 # Patch the "sta tube_host_r3_data" calls
 for base in (0xad37, 0xadb0):

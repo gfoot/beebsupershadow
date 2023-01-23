@@ -101,6 +101,12 @@ loop2:
 	lda #<normal_brkhandler : sta brkv
 	lda #>normal_brkhandler : sta brkv+1
 
+	; Tell the OS that the Tube is present
+	lda #$ea
+	ldx #$ff
+	ldy #0
+	jsr osbyte
+
 	jsr printimm
 	.byte "Loading language image ", 0
 
