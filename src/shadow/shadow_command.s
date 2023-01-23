@@ -7,6 +7,9 @@
     cmp #SCMD_INIT : beq do_init
 	cmp #SCMD_CALL : beq do_call
 	cmp #SCMD_ENTERLANG : beq do_enterlang
+	cmp #SCMD_REBOOT : beq do_reboot
+	cmp #SCMD_REENTERLANG : beq do_reenterlang
+	cmp #SCMD_SETESCAPEFLAG : beq do_setescapeflag
 
     brk
     .db $fa, "Unknown command", 0
@@ -31,6 +34,10 @@ do_enterlang:
 	lda print_ptr : sta brkptr
 	lda print_ptr+1 : sta brkptr+1
 
+do_reenterlang:
+	ldx memtop
+	ldy memtop+1
+
 	; Enter the language with reason code 1
 	lda #1
 do_call:
@@ -39,6 +46,20 @@ do_call:
 	sty jsrinst+2
 jsrinst:
 	jsr $1234
+	jmp normal_rts
+.)
+
+do_reboot:
+.(
+	jsr printimm
+	.byte "SuperShadow 64K", 13, 13, 0
+
+	jmp normal_rts
+.)
+
+do_setescapeflag:
+.(
+	stx $ff
 	jmp normal_rts
 .)
 

@@ -22,6 +22,9 @@ CMD_FSC = $fa
 SCMD_INIT = 0
 SCMD_CALL = 1
 SCMD_ENTERLANG = 2
+SCMD_REBOOT = 3
+SCMD_REENTERLANG = 4
+SCMD_SETESCAPEFLAG = 5
 
 
 ; Lowest ZP location used for shadow variables

@@ -107,8 +107,20 @@ loop2:
 	ldy #0
 	jsr osbyte
 
+	; Install our reset intercept, to automatically reenable things when Break is pressed
+	lda #248 : ldy #0 : ldx #<normal_breakhandler
+	jsr $fff4
+	lda #249 : ldy #0 : ldx #>normal_breakhandler
+	jsr $fff4
+	lda #247 : ldy #0 : ldx #$4c
+	jsr $fff4
+
 	jsr printimm
 	.byte "Loading language image ", 0
+
+	ldx #<cmd_disc
+	ldy #>cmd_disc
+	jsr oscli
 
 	lda #<language_filename : sta print_ptr
 	lda #>language_filename : sta print_ptr+1
@@ -130,6 +142,8 @@ loop2:
     ldy #>cmd_basic
     jmp oscli
 
+cmd_disc:
+	.byte "DISC", 13
 cmd_basic:
     .byte "BASIC", 13
 

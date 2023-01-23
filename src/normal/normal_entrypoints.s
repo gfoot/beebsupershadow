@@ -5,11 +5,12 @@
 ; actually call them here at present as we don't fake
 ; that the Tube is present for the OS ROM
 
+.(
 entry_copylanguage:
-	rts : rts : rts
+	jmp copylanguage
 
 entry_syncescapestatus:
-	rts : rts : rts
+	jmp syncescape
 
 entry_transfer:
 	; Look up the actual target address, put it in X and Y, and call shadow mode to store it
@@ -38,4 +39,25 @@ call_shadow_data_setaddr:
 	rts
 .)
 
+copylanguage:
+.(
+	; A = 0 => no language ROM found, do something
+	; A = 1 => language ROM selected
+	;              number in X and OSBYTE 252
+	;              offset to end of name string in Y and &FD
 
+	; The language should already be good to go, though, so just tell the shadow OS
+	; to re-enter it
+
+	lda #SCMD_REENTERLANG
+	jmp shadow_command
+.)
+
+syncescape:
+.(
+	lda #SCMD_SETESCAPEFLAG
+	ldx $ff
+	jmp shadow_command
+.)
+
+.)
