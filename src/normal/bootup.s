@@ -139,24 +139,23 @@ datatrans_setaddr:
 	stx srcptr : sty srcptr+1
 
 	; We only support modes 0 and 1; also want to stop on claim/release
-	cmp #2 : bcs disable
+	; So don't try to poke around inside the data block for other modes
+	cmp #2 : bcs call_shadow_data_setaddr
+
+	pha
 
 	ldy #0
 	lda (srcptr),y : tax
 	iny
 	lda (srcptr),y : tay
 
+	pla
+
 call_shadow_data_setaddr:
 	jsr shadow_data_setaddr
 
 	ldx srcptr : ldy srcptr+1
 	rts
-
-disable:
-	; We don't really have a way to disable anything at the moment, just use $8000 for now
-	ldy #$80
-	ldx #$00
-	jmp call_shadow_data_setaddr
 .)
 
 loadlanguage:

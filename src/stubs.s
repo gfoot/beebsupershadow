@@ -50,13 +50,9 @@ shadow_brk:
 shadow_data_setaddr:
 	jmp shadow_data_setaddr_impl
 
-; Data transfers - write a byte
-shadow_data_write:
-	jmp shadow_data_write_impl
-
-; Data transfers - read a byte
-shadow_data_read:
-	jmp shadow_data_read_impl
+; Data transfers - read or write a byte
+shadow_data_byte:
+	jmp shadow_data_byte_impl
 
 shadow_stubs_size = *-shadow_stubs_dest
 * = shadow_stubs_source + shadow_stubs_size
