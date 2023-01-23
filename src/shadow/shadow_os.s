@@ -20,13 +20,14 @@ shadow_code_dest:
 #include "shadow/shadow_osword.s"
 #include "shadow/copytonormal.s"
 #include "common/utils.s"
-#include "shadow/shadow_test.s"
+;#include "shadow/shadow_test.s"
 #include "shadow/shadow_osbyte.s"
 #include "shadow/shadow_oscli.s"
 #include "shadow/shadow_osfile.s"
 #include "shadow/shadow_osfind.s"
 #include "shadow/shadow_osargs.s"
 #include "shadow/shadow_osgbpb.s"
+#include "shadow/shadow_datatrans.s"
 
 ; The vectors file must be last
 #include "shadow/shadow_vectors.s"

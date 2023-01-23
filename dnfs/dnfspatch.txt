@@ -1,0 +1,45 @@
+Patching DNFS
+=============
+
+Need to trick it into thinking Tube is active
+	- but not so much that things start to fail
+		Not Tube Host setup etc
+		Does it use the Tube apart from these transfers?
+
+	9689 checks for Tube presence, stores flag at 0d67 (before claiming NMI region?!)
+		doesn't seem to get called on boot, load, *disc, etc
+
+	b467 also - and this one does get called
+		could patch b469 -  nop : ldx #$ff
+
+Change Tube initiations to setting up shadow transfers
+	0406 - A=0,A=1 - XY point to 4-byte address
+	       A=$C1 - claim
+	       A=$81 - release
+
+Change Tube FIFO interactions to jsrs to shadow routines
+	sta tube_host_r3_data => send byte from A, increment address
+		ad37, adb0
+	lda tube_host_r3_data => load byte into A, increment address
+		ad13, adbd
+
+	what are these? not in NMI handler:
+		8ba9 - transfer from page f
+		93bf, 93c2 - discard two bytes
+
+
+Plan
+====
+Not very thorough as I don't have a full disassembly and it's incredibly heavy-going... but...
+
+$0406 contains a routine to set the data transfer address for future operations
+
+Need to patch the ROM:
+	* NMI handlers to call shadow_data_read and shadow_data_write instead of Tube ops
+	* Tube presence detection to always think it's present
+
+
+
+
+
+

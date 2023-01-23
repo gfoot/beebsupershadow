@@ -25,14 +25,14 @@ do_osword_impl:
 
 transfer_and_return:
     ; Copy from our version of the parameter block
-    lda #<normal_inbuffer : sta $00
-    lda #>normal_inbuffer : sta $01
+    lda #<normal_inbuffer : sta srcptr
+    lda #>normal_inbuffer : sta srcptr+1
 
     ; The user's parameter block address in shadow memory is still on the stack, above
     ; our return address
     tsx
-    lda $0104,x : sta $02
-    lda $0103,x : sta $03
+    lda $0104,x : sta destptr
+    lda $0103,x : sta destptr+1
         
     ; Do the copy and return
     jsr copy_to_shadow
@@ -56,10 +56,10 @@ do_osword00_impl:
 
     bcs cancelled
     
-    lda #<normal_inbuffer : sta $00
-    lda #>normal_inbuffer : sta $01
-    pla : sta $03
-    pla : sta $02
+    lda #<normal_inbuffer : sta srcptr
+    lda #>normal_inbuffer : sta srcptr+1
+    pla : sta destptr+1
+    pla : sta destptr
 
     tya : pha
 

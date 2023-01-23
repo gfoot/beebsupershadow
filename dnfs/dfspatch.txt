@@ -1,0 +1,36 @@
+Patching DFS 2.26
+=================
+
+Notes based on the partial disassembly in py8dis
+
+
+* The NMI routines are daunting as they use a lot of self-modifying code
+* The core routine self-modifies in various ways:
+	* 9011, 9016, 9036, 903b - to advance the read/write memory address
+	* 8ff5, 901d - to chain to exit code at the right time
+* In addition when the handler is installed it immediately gets patched:
+	* 8fa5, 8fac - to convert it to write rather than read
+	* 8fb9 - to apply the initial memory address, if it's not a Tube transfer
+	* 8fc7 - to prevent incrementing the memory address, if it is a Tube transfer
+
+
+8f3f reads Tube presence using OSBYTE EA, and stores the inverted result at 10d6
+
+In the NMI handler, 900e writes to the Tube and 9030 reads from the Tube - these need to be replaced with jsrs
+	- but probably dynamically as the lda/sta that's there already is correct for non-Tube reads/writes
+
+00a1 - b7=use Tube, b6=write
+
+*RUN
+890a - seems to check if the two top bytes of exec address, anded together, equal the Tube presence flag at 10d6
+		if so, it calls tube_entry with a=4 (execute in copro)
+
+
+9811 - uses Tube presence flag as well
+	1063,1064 must contain high bytes of address
+	if it's a host address, beq at 9817 will be taken
+	or if tube flag is all ones
+	8f6b gets called for Tube transfers
+	1081 also gets set to ff
+	and carry, so 9827 only on tube
+		=> tube entry, a=from 107f

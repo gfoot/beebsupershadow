@@ -26,7 +26,7 @@ SCMD_ENTERLANG = 2
 
 
 ; Buffers for shadow-to-normal transfers
-normal_inbuffer = $400
+normal_inbuffer = $500
 
 ; Buffers for normal-to-shadow transfers
 shadow_inbuffer = $300

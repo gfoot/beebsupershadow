@@ -26,7 +26,7 @@ copy_to_shadow:
 
 	dey
 loop:
-	lda ($00),y : sta ($02),y
+	lda (srcptr),y : sta (destptr),y
 	dey
 	cpy #$ff
 	bne loop

@@ -53,10 +53,10 @@ loop:
     .byte "Installing shadow stubs", 13, 0
 
 	; Copy the shadow stubs into shadow zero page ready for use
-	lda #<shadow_stubs_source : sta $0
-	lda #>shadow_stubs_source : sta $1
-	lda #<shadow_stubs_dest : sta $2
-	lda #>shadow_stubs_dest : sta $3
+	lda #<shadow_stubs_source : sta srcptr
+	lda #>shadow_stubs_source : sta srcptr+1
+	lda #<shadow_stubs_dest : sta destptr
+	lda #>shadow_stubs_dest : sta destptr+1
 	ldy #shadow_stubs_size
 	jsr copy_to_shadow
 
@@ -64,17 +64,17 @@ loop:
     .byte "Uploading shadow OS ", 0
 
 	; Copy the main shadow code image to shadow memory
-	lda #<shadow_code_source : sta $0
-	lda #>shadow_code_source : sta $1
-	lda #<shadow_code_dest : sta $2
-	lda #>shadow_code_dest : sta $3
+	lda #<shadow_code_source : sta srcptr
+	lda #>shadow_code_source : sta srcptr+1
+	lda #<shadow_code_dest : sta destptr
+	lda #>shadow_code_dest : sta destptr+1
 
 	ldx #>(shadow_code_size+255)
 	ldy #<shadow_code_size
 
 loop2:
 	jsr copy_to_shadow
-	inc $1 : inc $3	
+	inc srcptr+1 : inc destptr+1	
 	iny ; to 0 which means 256 bytes
     lda #'.' : jsr oswrch
 	dex : bne loop2
@@ -95,8 +95,8 @@ loop2:
 	jsr printimm
 	.byte "Uploading to shadow RAM at &", 0
 
-	lda $7 : jsr printhex
-	lda $6 : jsr printhex
+	lda langaddr+1 : jsr printhex
+	lda langaddr : jsr printhex
 	jsr osnewl
 
 	jsr uploadlanguage
@@ -108,13 +108,19 @@ loop2:
 	lda #SCMD_INIT
 	jsr shadow_command
 
+	; Copy a jmp instruction to $0406 - the Tube Host entry point - so that whenever it's called it
+	; sets the shadow address of any future data transfer operations
+	lda #$4c : sta $0406   ; jmp absolute
+	lda #<datatrans_setaddr : sta $0407
+	lda #>datatrans_setaddr : sta $0408
+
 	; Install the BRK handler here as we're about to enter a language
 	lda #<normal_brkhandler : sta brkv
 	lda #>normal_brkhandler : sta brkv+1
 
 	lda #SCMD_ENTERLANG
-	ldx $6
-	ldy $7
+	ldx langaddr
+	ldy langaddr+1
 	jsr shadow_command
 
     ; If it returns somehow, we can't really carry on as we've corrupted BASIC's 
@@ -127,6 +133,32 @@ cmd_basic:
     .byte "BASIC", 13
 
 
+; Look up the actual target address, put it in X and Y, and call shadow mode to store it
+datatrans_setaddr:
+.(
+	stx srcptr : sty srcptr+1
+
+	; We only support modes 0 and 1; also want to stop on claim/release
+	cmp #2 : bcs disable
+
+	ldy #0
+	lda (srcptr),y : tax
+	iny
+	lda (srcptr),y : tay
+
+call_shadow_data_setaddr:
+	jsr shadow_data_setaddr
+
+	ldx srcptr : ldy srcptr+1
+	rts
+
+disable:
+	; We don't really have a way to disable anything at the moment, just use $8000 for now
+	ldy #$80
+	ldx #$00
+	jmp call_shadow_data_setaddr
+.)
+
 loadlanguage:
 .(
 	lda #$ff
@@ -136,7 +168,7 @@ loadlanguage:
 
 osfileparams:
 	.word language_filename
-	.word languageimg, 0 ; load address
+	.word languageimg, $ffff ; load address
 	.word 0, 0
 	.word 0, 0
 	.word 0, 0
@@ -151,8 +183,8 @@ languageimg = $3000
 getrelocaddress:
 .(
 	; The default base address for a language ROM is $8000
-	lda #$00 : sta $6
-	lda #$80 : sta $7
+	lda #$00 : sta langaddr
+	lda #$80 : sta langaddr+1
 
 	; Byte 6 bit 6 indicates whether the language has a relocation address
 	lda #$20 : bit languageimg+6 : beq noreloc
@@ -166,8 +198,8 @@ skiptonextzeroloop:
 	iny ; skip the zero
 
 	; Copy out the relocation address
-	lda languageimg,y : sta $6
-	lda languageimg+1,y : sta $7
+	lda languageimg,y : sta langaddr
+	lda languageimg+1,y : sta langaddr+1
 
 noreloc:
 	rts
@@ -176,15 +208,15 @@ noreloc:
 
 uploadlanguage:
 .(
-	lda #<languageimg : sta $0
-	lda #>languageimg : sta $1
-	lda $6 : sta $2
-	lda $7 : sta $3
+	lda #<languageimg : sta srcptr
+	lda #>languageimg : sta srcptr+1
+	lda langaddr : sta destptr
+	lda langaddr+1 : sta destptr+1
 
 	ldx #$40
 copyloop:
 	ldy #0 : jsr copy_to_shadow
-	inc $1 : inc $3
+	inc srcptr+1 : inc destptr+1
 	dex : bne copyloop
 
 	rts
