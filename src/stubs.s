@@ -54,6 +54,10 @@ shadow_brk:
 shadow_data_setaddr:
 	jmp shadow_data_setaddr_impl
 
+; Execute shadow EVNTV
+shadow_event:
+	jmp shadow_event_impl
+
 shadow_stubs_end = *
 
 shadow_stubs_size = shadow_stubs_end-shadow_stubs_dest

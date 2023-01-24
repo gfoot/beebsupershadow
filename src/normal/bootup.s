@@ -101,6 +101,12 @@ loop2:
 	lda #<normal_brkhandler : sta brkv
 	lda #>normal_brkhandler : sta brkv+1
 
+	; And the event handler
+	lda evntv : sta normal_eventhandler_oldevntv
+	lda evntv+1 : sta normal_eventhandler_oldevntv+1
+	lda #<normal_eventhandler : sta evntv
+	lda #>normal_eventhandler : sta evntv+1
+
 	; Tell the OS that the Tube is present
 	lda #$ea
 	ldx #$ff

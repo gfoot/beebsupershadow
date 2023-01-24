@@ -26,6 +26,7 @@ lang_ws_dest:
 #include "normal/normal_cmd_osword.s"
 #include "normal/normal_brk.s"
 #include "normal/normal_breakhandler.s"
+#include "normal/normal_event.s"
 
 &lang_ws_end:
 
