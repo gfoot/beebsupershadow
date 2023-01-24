@@ -2,11 +2,18 @@
 
 shadow_osbyte:
 .(
+	; Hack for VIEW - it expects Y to be zero or preserved during low OSBYTEs
+	cmp #$80 : bcc lowosbyte
+
 	cmp #$82 : beq shadow_osbyte82
     cmp #$83 : beq shadow_osbyte83
-    cmp #$84 : beq shadow_osbyte8485
-	cmp #$85 : beq shadow_osbyte8485
+    cmp #$84 : beq shadow_osbyte84
     jmp normal_osbyte
+
+lowosbyte:
+	jsr normal_osbyte
+	ldy #0
+	rts
 
 shadow_osbyte82:
 	ldx #0
@@ -18,7 +25,7 @@ shadow_osbyte83:
     ldy #>oshwm
     rts
 
-shadow_osbyte8485:
+shadow_osbyte84:
     ldx memtop
     ldy memtop+1
     rts
