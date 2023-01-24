@@ -37,7 +37,7 @@ loop3:
 	lda lang_ws_source,y : sta lang_ws_dest,y
 	lda lang_ws_source+$100,y : sta lang_ws_dest+$100,y
 	lda lang_ws_source+$200,y : sta lang_ws_dest+$200,y
-	; (the remaining page is just a buffer and doesn't need initialising)
+	lda lang_ws_source+$300,y : sta lang_ws_dest+$300,y
 	iny
 	bne loop3
 
@@ -97,21 +97,9 @@ loop2:
 	lda #SCMD_INIT
 	jsr shadow_command
 
-	; Install the BRK handler as the shadow OS is ready for it now
-	lda #<normal_brkhandler : sta brkv
-	lda #>normal_brkhandler : sta brkv+1
-
-	; And the event handler
-	lda evntv : sta normal_eventhandler_oldevntv
-	lda evntv+1 : sta normal_eventhandler_oldevntv+1
-	lda #<normal_eventhandler : sta evntv
-	lda #>normal_eventhandler : sta evntv+1
-
-	; Tell the OS that the Tube is present
-	lda #$ea
-	ldx #$ff
-	ldy #0
-	jsr osbyte
+	; Now that the Shadow OS is initialised, we can hook vectors with routines to
+	; pass them to Shadow mode, etc
+	jsr normal_postshadowinit_setup
 
 	; Install our reset intercept, to automatically reenable things when Break is pressed
 	lda #248 : ldy #0 : ldx #<normal_breakhandler
@@ -124,13 +112,14 @@ loop2:
 	jsr printimm
 	.byte "Loading language image ", 0
 
-	ldx #<cmd_disc
-	ldy #>cmd_disc
-	jsr oscli
-
 	lda #<language_filename : sta print_ptr
 	lda #>language_filename : sta print_ptr+1
 	jsr print
+
+	; Issue a *DISC command so that DNFS reinitialises with its Tube support enabled
+	ldx #<cmd_disc
+	ldy #>cmd_disc
+	jsr oscli
 
 	lda #$ff
 	ldx #<osfileparams
@@ -140,18 +129,14 @@ loop2:
 	lda #SCMD_ENTERLANG
 	ldx osfileparams+2
 	ldy osfileparams+3
-	jsr shadow_command
+	jmp shadow_command_then_hang
 
     ; If it returns somehow, we can't really carry on as we've corrupted BASIC's 
-	; zero page, so re-enter it to let it reinitialise everything
-    ldx #<cmd_basic
-    ldy #>cmd_basic
-    jmp oscli
-
+	; zero page and set weird vectors, so just hang.  This code also may no longer exist
+	; in memory at that time.
+	
 cmd_disc:
 	.byte "DISC", 13
-cmd_basic:
-    .byte "BASIC", 13
 
 osfileparams:
 	.word language_filename

@@ -9,16 +9,26 @@ normal_breakhandler:
 .(
     bcs secondtime
     rts
-
 secondtime:
+.)
 
     ; Tell the shadow side what happened
     lda #SCMD_REBOOT
     jsr shadow_command    
 
-	; Install the BRK handler as the shadow OS should still be ready for it
+    ; Fall through to actions we need to take in normal mode after shadow mode is
+    ; initialised
+
+normal_postshadowinit_setup:
+	; Install the BRK handler as the shadow OS is ready for it now
 	lda #<normal_brkhandler : sta brkv
 	lda #>normal_brkhandler : sta brkv+1
+
+	; And the event handler
+	lda evntv : sta normal_eventhandler_oldevntv
+	lda evntv+1 : sta normal_eventhandler_oldevntv+1
+	lda #<normal_eventhandler : sta evntv
+	lda #>normal_eventhandler : sta evntv+1
 
 	; Tell the OS that the Tube is present
 	lda #$ea
@@ -27,5 +37,4 @@ secondtime:
 	jsr osbyte
 
     rts
-.)
 

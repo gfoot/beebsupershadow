@@ -46,11 +46,10 @@ copylanguage:
 	;              number in X and OSBYTE 252
 	;              offset to end of name string in Y and &FD
 
-	; The language should already be good to go, though, so just tell the shadow OS
-	; to re-enter it
+	; For now just rerun the old language, in future we'll support uploading new ones here
 
 	lda #SCMD_REENTERLANG
-	jmp shadow_command
+	jmp shadow_command_then_hang
 .)
 
 syncescape:
@@ -61,3 +60,14 @@ syncescape:
 .)
 
 .)
+
+
+; For when we don't expect a shadow command to return
+shadow_command_then_hang:
+.(
+	jsr shadow_command
+
+hang:
+	jmp hang
+.)
+

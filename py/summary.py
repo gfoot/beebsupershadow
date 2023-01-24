@@ -38,5 +38,4 @@ report("Lang w/s source", "lang_ws_source", "lang_ws_source_end")
 report("Shadow stubs source", "shadow_stubs_source", "shadow_stubs_source_end")
 report("Normal stubs source", "normal_stubs_source", "normal_stubs_source_end")
 report("Shadow OS source", "shadow_code_source", "shadow_code_source_end")
-report("Language temp load addr", "languageimg", None)
 

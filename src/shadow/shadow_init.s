@@ -1,16 +1,18 @@
 shadow_init:
-.(
-    jsr initvectors
-
 	; Default memtop - will be reduced when a language is loaded
 	lda #$00 : sta memtop
 	lda #$f8 : sta memtop+1
 
-    jsr printimm
-    .byte 13, "SuperShadow OS 64K", 13, 13, 0
+	; fall through
 
-    ;jsr shadow_test
+shadow_reboot:
+    jsr initvectors
 
-    jmp normal_rts
-.)
+	; Clear the Escape flag
+	lda #$00 : sta escapeflag
+	
+	jsr printimm
+	.byte "SuperShadow 64K", 13, 13, 0
+
+	jmp normal_rts
 

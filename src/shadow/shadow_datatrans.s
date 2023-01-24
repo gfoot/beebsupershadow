@@ -34,14 +34,13 @@ ok:
 	; system above, just now do the execute as well.
 	cmp #4
 	bne return
-	jsr execute
+
+	ldx srcptr
+	ldy srcptr+1
+	jsr wrapped_entercode
 
 return:
 	jmp normal_rts
-
-execute:
-	lda #1
-	jmp (srcptr)
 
 instrs:
 	.byte $ad ; lda absolute
