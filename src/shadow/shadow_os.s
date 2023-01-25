@@ -14,14 +14,12 @@ shadow_code_dest:
 #include "shadow/shadow_constants.s"
 #include "shadow/shadow_command.s"
 #include "shadow/shadow_init.s"
-#include "shadow/shadow_gs.s"
 #include "shadow/shadow_interrupts.s"
 #include "shadow/shadow_commands_simple.s"
 #include "shadow/shadow_osword.s"
 #include "shadow/copytonormal.s"
 #include "common/utils.s"
 ;#include "shadow/shadow_test.s"
-#include "shadow/shadow_osbyte.s"
 #include "shadow/shadow_oscli.s"
 #include "shadow/shadow_osfile.s"
 #include "shadow/shadow_osfind.s"
@@ -30,6 +28,12 @@ shadow_code_dest:
 #include "shadow/shadow_datatrans.s"
 #include "shadow/shadow_event.s"
 #include "shadow/shadow_entercode.s"
+
+
+padding:
+    .dsb $ff00-*, $00
+
+#include "shadow/shadow_osbyte.s"
 #include "shadow/shadow_utils.s"
 
 ; The vectors file must be last

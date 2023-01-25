@@ -44,7 +44,7 @@ defaultvectors:
     .word normal_osbput
     .word gbpbhandler
     .word findhandler
-    .word fschandler
+    .word unsupported       ; fscv 
     .word rts_statement     ; evntv
     .word unsupported       ; uptv
     .word unsupported       ; netv
@@ -53,9 +53,9 @@ defaultvectors:
     .word unsupported       ; insv
     .word unsupported       ; remv
     .word unsupported       ; cnpv
-    .word unsupported       ; ind1v
-    .word unsupported       ; ind2v
-    .word unsupported       ; ind3v
+    .word rts_statement     ; ind1v
+    .word rts_statement     ; ind2v
+    .word rts_statement     ; ind3v
 defaultvectors_size = *-defaultvectors
 
 
@@ -73,10 +73,10 @@ defaultvectors_size = *-defaultvectors
     jmp normal_osevnt
 
 ;gsinit:                     ; ffc2
-    jmp gsinithandler
+    jmp unsupported
 
 ;gsread:                     ; ffc5
-    jmp gsreadhandler
+    jmp unsupported
 
 ;nvrdch:                     ; ffc8
     jmp rdchhandler
