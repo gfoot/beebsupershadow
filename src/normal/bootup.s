@@ -109,44 +109,29 @@ loop2:
 	lda #247 : ldy #0 : ldx #$4c
 	jsr $fff4
 
-	jsr printimm
-	.byte "Loading language image ", 0
-
-	lda #<language_filename : sta print_ptr
-	lda #>language_filename : sta print_ptr+1
-	jsr print
-
 	; Issue a *DISC command so that DNFS reinitialises with its Tube support enabled
 	ldx #<cmd_disc
 	ldy #>cmd_disc
 	jsr oscli
 
-	lda #$ff
-	ldx #<osfileparams
-	ldy #>osfileparams
-	jsr osfile
-
-	lda #SCMD_ENTERLANG
-	ldx osfileparams+2
-	ldy osfileparams+3
-	jmp shadow_command_then_hang
+	; Issue *BASIC to run it in the shadow memory
+	ldx #<cmd_basic
+	ldy #>cmd_basic
+	jsr oscli
 
     ; If it returns somehow, we can't really carry on as we've corrupted BASIC's 
 	; zero page and set weird vectors, so just hang.  This code also may no longer exist
 	; in memory at that time.
+hang:
+	jmp hang
 	
 cmd_disc:
 	.byte "DISC", 13
 
-osfileparams:
-	.word language_filename
-	.word 0, 0 ; load address
-	.word 1, 0 ; exec address
-	.word 0, 0
-	.word 0, 0
+cmd_basic:
+	.byte "BASIC", 13
 
-language_filename:
-	.byte "HIBAS3", 13, 0
-
+cmd_hibasic:
+	.byte "HIBAS3", 13
 .)
 

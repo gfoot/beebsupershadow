@@ -30,6 +30,7 @@ shadow_code_dest:
 #include "shadow/shadow_datatrans.s"
 #include "shadow/shadow_event.s"
 #include "shadow/shadow_entercode.s"
+#include "shadow/shadow_utils.s"
 
 ; The vectors file must be last
 #include "shadow/shadow_vectors.s"

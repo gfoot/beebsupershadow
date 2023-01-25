@@ -11,8 +11,9 @@ shadow_osbyte:
     jmp normal_osbyte
 
 lowosbyte:
+	sty memtop+2
 	jsr normal_osbyte
-	ldy #0
+	ldy memtop+2
 	rts
 
 shadow_osbyte82:
