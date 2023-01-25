@@ -68,6 +68,7 @@ checksoftbreak:
 docopylanguage:
 	; We're going to copy a new language image and run it
 	; The language is already paged in by the OS
+	cli
 
 	; The default base address for a language ROM is $8000
 	lda #$00 : sta destptr

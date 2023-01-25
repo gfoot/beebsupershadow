@@ -91,7 +91,7 @@ loop2:
     jsr osnewl
 	
     jsr printimm
-    .byte "Initialising shadow OS", 13, 0
+    .byte "Initialising shadow OS", 13, 13, 0
 
 	; Send the initialisation command
 	lda #SCMD_INIT
