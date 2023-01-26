@@ -1,7 +1,7 @@
 Name     supershadow ;
 PartNo   00 ;
-Date     20/01/2023 ;
-Revision 03 ;
+Date     25/01/2023 ;
+Revision 04 ;
 Designer George Foot ;
 Company  gfoot360 ;
 Assembly None ;
@@ -13,13 +13,13 @@ pin 1 = PHI0;
 /* inputs */
 pin 2 = SYNC;
 pin 3 = RWB;
-pin [ 4..11, 13..14 ] = [ A6..15 ];
+pin [ 4..9, 10, 16, 13, 11 ] = [ A6..15 ];
 
 /* outputs */
-pin [ 15, 16, 17, 18, 19, 20, 21, 22 ] = [ RSHAD, WSHAD, !BEEB, !SRHI, !SRLO, !WE, A15_BEEB, RWB_BEEB ];
+pin [ 22, 21, 17, 18, 19, 20, 14, 23 ] = [ RSHAD, WSHAD, !BEEB, !SRHI, !SRLO, !WE, A10_BEEB, RWB_BEEB ];
 
 /* intermediate */
-pin 23 = NZP; /* nearly zero-page */
+pin 15 = NZP; /* nearly zero-page */
 
 Field addrhi = [A15..A8];
 
@@ -41,7 +41,7 @@ SRLO = !BEEB & !A15;
 
 WE = PHI0 & !RWB;
 
-A15_BEEB = A15 & BEEB;
+A10_BEEB = A10 & BEEB;
 
 RWB_BEEB = RWB # !BEEB;
 

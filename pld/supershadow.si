@@ -1,7 +1,7 @@
 Name     supershadow;
 PartNo   00;
-Date     20/01/2023;
-Revision 03;
+Date     25/01/2023;
+Revision 04;
 Designer George Foot;
 Company  gfoot360;
 Assembly None;
@@ -9,7 +9,7 @@ Location None;
 Device   g22v10;
 
 
-ORDER: PHI0, %1, SYNC, RWB, %1, addrhi, A7, A6, %2, NZP, %1, RSHAD, WSHAD, %1, BEEB, SRHI, SRLO, %1, WE, %1, RWB_BEEB, A15_BEEB;
+ORDER: PHI0, %1, SYNC, RWB, %1, addrhi, A7, A6, %2, NZP, %1, RSHAD, WSHAD, %1, BEEB, SRHI, SRLO, %1, WE, %1, RWB_BEEB, A10_BEEB;
 
 VECTORS:
 P 00 '00'00 0 11 000 0 00
