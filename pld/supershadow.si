@@ -1,7 +1,7 @@
 Name     supershadow;
 PartNo   00;
-Date     25/01/2023;
-Revision 04;
+Date     26/01/2023;
+Revision 05;
 Designer George Foot;
 Company  gfoot360;
 Assembly None;
@@ -40,11 +40,11 @@ C 01 '00'00 H LH HLL L HL
 C 01 'FF'11 L LH HLL L HH
 
 $msg "  Shadow writes, normal reads - writes";
-0 00 '00'00 H LH LLH L HL
-C 00 '00'00 H LH LLH L HL
+0 00 '00'00 H LH LLL L HL
+C 00 '00'00 H LH LLL L HL
 1 00 '00'00 H LH LLH H HL
-0 00 'FF'10 L LH LHL L HL
-C 00 'FF'10 L LH LHL L HL
+0 00 'FF'10 L LH LLL L HL
+C 00 'FF'10 L LH LLL L HL
 1 00 'FF'10 L LH LHL H HL
 
 $msg "Set up for shadow writes, shadow reads";
@@ -59,11 +59,11 @@ C 01 '00'00 H HH LLH L HL
 C 01 'FF'11 L HH LHL L HL
 
 $msg "  Shadow writes, shadow reads - writes";
-0 00 '00'00 H HH LLH L HL
-C 00 '00'00 H HH LLH L HL
+0 00 '00'00 H HH LLL L HL
+C 00 '00'00 H HH LLL L HL
 1 00 '00'00 H HH LLH H HL
-0 00 'FF'10 L HH LHL L HL
-C 00 'FF'10 L HH LHL L HL
+0 00 'FF'10 L HH LLL L HL
+C 00 'FF'10 L HH LLL L HL
 1 00 'FF'10 L HH LHL H HL
 
 $msg "Set up for non-shadow writes, shadow reads";
@@ -107,8 +107,8 @@ C 00 'FF'11 L LL HLL L LH
 $msg "  Stack in normal mode";
 0 01 '01'00 H LL LLH L HL
 C 01 '01'00 H LL LLH L HL
-0 00 '01'00 H LL LLH L HL
-C 00 '01'00 H LL LLH L HL
+0 00 '01'00 H LL LLL L HL
+C 00 '01'00 H LL LLL L HL
 1 00 '01'00 H LL LLH H HL
 
 $msg "Set up for shadow writes, shadow reads";
@@ -119,7 +119,7 @@ C 11 '00'11 H HH LLH L HL
 $msg "  Stack in shadow mode";
 0 01 '01'00 H HH LLH L HL
 C 01 '01'00 H HH LLH L HL
-0 00 '01'00 H HH LLH L HL
-C 00 '01'00 H HH LLH L HL
+0 00 '01'00 H HH LLL L HL
+C 00 '01'00 H HH LLL L HL
 1 00 '01'00 H HH LLH H HL
 

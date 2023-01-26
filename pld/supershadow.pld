@@ -1,7 +1,7 @@
 Name     supershadow ;
 PartNo   00 ;
-Date     25/01/2023 ;
-Revision 04 ;
+Date     26/01/2023 ;
+Revision 05 ;
 Designer George Foot ;
 Company  gfoot360 ;
 Assembly None ;
@@ -36,8 +36,8 @@ zpsync = zp & SYNC;
 
 BEEB = RWB & !RSHAD & !stack # !RWB & !WSHAD & !stack;
 
-SRHI = !BEEB & A15;
-SRLO = !BEEB & !A15;
+SRHI = !BEEB & A15 & (RWB # PHI0);
+SRLO = !BEEB & !A15 & (RWB # PHI0);
 
 WE = PHI0 & !RWB;
 
