@@ -3,7 +3,7 @@ shadow_init:
 	lda #$00 : sta memtop
 	lda #$f8 : sta memtop+1
 
-	; fall through
+	jmp normal_rts
 
 shadow_reboot:
     jsr initvectors

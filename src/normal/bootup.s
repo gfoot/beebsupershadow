@@ -25,11 +25,10 @@
 ; regions were still active in shadow mode, which they're not at the moment.
 
 
-
-execaddr:
++bootup:
 .(
-    jsr printimm
-    .byte "SuperShadow starting", 13, 0
+    ;jsr printimm
+    ;.byte "SuperShadow starting", 13, 0
 
 	; Relocate the long-term normal mode host code into the language workspace
 	ldy #0
@@ -41,8 +40,8 @@ loop3:
 	iny
 	bne loop3
 
-    jsr printimm
-    .byte "Installing normal stubs", 13, 0
+    ;jsr printimm
+    ;.byte "Installing normal stubs", 13, 0
 
 	; Copy the normal mode entry points into zero page, so that 
 	; shadow code can use them to trigger normal code to run
@@ -58,8 +57,8 @@ loop:
 	lda #$60
 	sta `normal_read_shadow_write
 
-    jsr printimm
-    .byte "Installing shadow stubs", 13, 0
+    ;jsr printimm
+    ;.byte "Installing shadow stubs", 13, 0
 
 	; Copy the shadow stubs into shadow zero page ready for use
 	lda #<shadow_stubs_source : sta srcptr
@@ -69,8 +68,8 @@ loop:
 	ldy #shadow_stubs_size
 	jsr copy_to_shadow
 
-    jsr printimm
-    .byte "Uploading shadow OS ", 0
+    ;jsr printimm
+    ;.byte "Uploading shadow OS ", 13, 0
 
 	; Copy the main shadow code image to shadow memory
 	lda #<shadow_code_source : sta srcptr
@@ -85,21 +84,7 @@ loop2:
 	jsr copy_to_shadow
 	inc srcptr+1 : inc destptr+1	
 	iny ; to 0 which means 256 bytes
-    lda #'.' : jsr oswrch
 	dex : bne loop2
-
-    jsr osnewl
-	
-    jsr printimm
-    .byte "Initialising shadow OS", 13, 13, 0
-
-	; Send the initialisation command
-	lda #SCMD_INIT
-	jsr shadow_command
-
-	; Now that the Shadow OS is initialised, we can hook vectors with routines to
-	; pass them to Shadow mode, etc
-	jsr normal_postshadowinit_setup
 
 	; Install our reset intercept, to automatically reenable things when Break is pressed
 	lda #248 : ldy #0 : ldx #<normal_breakhandler
@@ -109,29 +94,6 @@ loop2:
 	lda #247 : ldy #0 : ldx #$4c
 	jsr $fff4
 
-	; Issue a *DISC command so that DNFS reinitialises with its Tube support enabled
-	ldx #<cmd_disc
-	ldy #>cmd_disc
-	jsr oscli
-
-	; Issue *BASIC to run it in the shadow memory
-	ldx #<cmd_basic
-	ldy #>cmd_basic
-	jsr oscli
-
-    ; If it returns somehow, we can't really carry on as we've corrupted BASIC's 
-	; zero page and set weird vectors, so just hang.  This code also may no longer exist
-	; in memory at that time.
-hang:
-	jmp hang
-	
-cmd_disc:
-	.byte "DISC", 13
-
-cmd_basic:
-	.byte "BASIC", 13
-
-cmd_hibasic:
-	.byte "HIBAS3", 13
+	rts
 .)
 

@@ -5,21 +5,16 @@
 ; This is late enough that DNFS won't try to initialise the Tube itself, but early enough 
 ; that the OS will invite us to deal with language activation.
 
-normal_breakhandler:
+&normal_breakhandler:
 .(
     bcs secondtime
     rts
-secondtime:
-.)
 
+secondtime:
     ; Tell the shadow side what happened
     lda #SCMD_REBOOT
     jsr shadow_command    
 
-    ; Fall through to actions we need to take in normal mode after shadow mode is
-    ; initialised
-
-normal_postshadowinit_setup:
 	; Install the BRK handler as the shadow OS is ready for it now
 	lda #<normal_brkhandler : sta brkv
 	lda #>normal_brkhandler : sta brkv+1
@@ -37,4 +32,5 @@ normal_postshadowinit_setup:
 	jsr osbyte
 
     rts
+.)
 

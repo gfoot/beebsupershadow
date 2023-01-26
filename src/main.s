@@ -1,10 +1,12 @@
 ; Main file pulling all the code into one binary
 
-; This is where this bootstrap code loads and executes in normal memory
-* = $2000
-loadaddr:
-
 #include "constants.s"
+
+#ifdef STANDALONE
+#include "standalone.s"
+#else
+#include "romheader.s"
+#endif
 
 ; The normal-mode code boots the system and services requests from the shadow code
 #include "normal/normal.s"
