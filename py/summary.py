@@ -26,16 +26,6 @@ print("")
 report("Shadow stubs", "shadow_stubs_dest", "shadow_stubs_end")
 report("Shadow ZP vars", "shadow_zpvars", 0x100)
 report("Shadow inbuffer", "shadow_inbuffer", None)
-report("Shadow OS", "shadow_code_dest", "shadowos_top")
-report("Shadow vectors", "osrdrm", 0x10000)
-
-print("")
-
-report("Load addr", "loadaddr", "loadend")
-report("Exec addr", "execaddr", None)
-report("Bootup", "bootup_begin", "bootup_end")
-report("Lang w/s source", "lang_ws_source", "lang_ws_source_end")
-report("Shadow stubs source", "shadow_stubs_source", "shadow_stubs_source_end")
-report("Normal stubs source", "normal_stubs_source", "normal_stubs_source_end")
-report("Shadow OS source", "shadow_code_source", "shadow_code_source_end")
+report("Shadow OS Low", "shadow_os_low_dest", "shadow_os_low_end")
+report("Shadow OS High", "shadow_os_high_dest", "shadow_os_high_end")
 

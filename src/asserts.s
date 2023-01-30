@@ -1,11 +1,4 @@
 
-#if shadow_data_byte <> $c0
-#echo ERROR: shadow_data_byte should be at $c0
-#print shadow_data_byte
-	jmp builderror
-#endif
-
-
 #if shadow_stubs_end > shadow_zpvars
 #echo ERROR: Shadow stubs extend beyond shadow_zpvars
 #print shadow_stubs_end
@@ -14,8 +7,8 @@
 #endif
 
 
-#if normal_stubs_end > $40
-#echo ERROR: Normal stubs extend beyond $40
+#if normal_stubs_end > $80
+#echo ERROR: Normal stubs extend beyond $80
 #print normal_stubs_end
 	jmp builderror
 #endif

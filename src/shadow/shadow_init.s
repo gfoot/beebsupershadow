@@ -14,5 +14,7 @@ shadow_reboot:
 	jsr printimm
 	.byte "SuperShadow 64K", 13, 13, 0
 
+	;jsr shadow_test
+
 	jmp normal_rts
 

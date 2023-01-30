@@ -61,7 +61,6 @@ defaultvectors_size = *-defaultvectors
 
 &shadowos_top
     .dsb $ffb9-*, $00      ; pad to vectors
-#print *-shadowos_top
 
 ;osrdrm:                     ; ffb9
     jmp osrdrmhandler

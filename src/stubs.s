@@ -2,36 +2,14 @@
 ; provides various actions that normal mode code can trigger when switching to
 ; shadow mode
 shadow_stubs_source:
-    * = $bd
+    * = $c0
 shadow_stubs_dest:
-
-; Flag to say whether we're in shadow-read-normal-write mode - set it to $80
-; before entering the mode
-shadow_read_normal_write_flag:
-    .byte 0
-
-; Stay in shadow mode but write to normal memory
-shadow_read_normal_write:
-	rts
-
-; Same but with rti
-shadow_read_normal_write_rti:
-    rti
-
-; The address at this point should be $C0
-
-; Data transfers - read or write a byte
-shadow_data_byte:
-	jmp shadow_data_byte_impl
 
 ; Main shadow entry point from normal mode
 ; A = command code, X,Y = parameters
 shadow_command:
 	jmp shadow_command_impl
 
-; Exit from shadow-read-normal-write mode
-shadow_read_normal_write_off:
-    asl shadow_read_normal_write_flag
 ; RTS into shadow mode
 shadow_rts:
 	rts
@@ -40,8 +18,6 @@ shadow_rts:
 ; and maybe actually return into shadow-read-normal-write mode
 shadow_rtnmi:
     pla
-    bit shadow_read_normal_write_flag
-    bmi shadow_read_normal_write_rti
 ; RTI into shadow mode
 shadow_rti:
     rti
@@ -49,10 +25,6 @@ shadow_rti:
 ; Execute shadow BRKV
 shadow_brk:
 	jmp shadow_brkhandler_impl
-
-; Data transfers - set address
-shadow_data_setaddr:
-	jmp shadow_data_setaddr_impl
 
 ; Execute shadow EVNTV
 shadow_event:
@@ -111,20 +83,20 @@ normal_osbput:
 normal_command:
 	jmp normal_command_impl
 
-
 ; Return into normal mode from shadow mode
 normal_rts:
 	rts
+
+; Initiate a copy from shadow memory to normal memory
+;
+; The source address is preloaded in the hardware register.
+; A contains the byte count and YYXX points to the destination address.
+normal_copy_from_shadow:
+	jmp normal_copy_from_shadow_impl
 
 normal_stubs_end = *
 
 normal_stubs_size = normal_stubs_end-normal_stubs_dest
 	* = normal_stubs_source + normal_stubs_size
 normal_stubs_source_end:
-
-; Routine to switch into the special mode where reads come from normal memory but
-; writes go to shadow memory.  It just contains an RTS (initialized on bootup).
-normal_read_shadow_write = $40
-
-
 

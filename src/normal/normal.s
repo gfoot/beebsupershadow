@@ -21,6 +21,7 @@ lang_ws_dest:
 #include "normal/normal_entrypoints.s"
 
 #include "normal/copytoshadow.s"
+#include "normal/copyfromshadow.s"
 #include "normal/normal_interrupts.s"
 #include "normal/normal_command.s"
 #include "normal/normal_cmd_osword.s"

@@ -13,29 +13,34 @@ entry_syncescapestatus:
 	jmp syncescape
 
 entry_transfer:
-	; Look up the actual target address, put it in X and Y, and call shadow mode to store it
 .(
 	stx srcptr : sty srcptr+1
 
 	; We only support modes 0, 1 and 4; also want to stop on claim/release
 	; So don't try to poke around inside the data block for other modes
 	cmp #2 : bcc readaddr
-	cmp #4 : bne call_shadow_data_setaddr
+	cmp #4 : bne return
 
 readaddr:
 	pha
 
-	ldy #0
-	lda (srcptr),y : tax
-	iny
-	lda (srcptr),y : tay
+	; Look up the actual target address and send it to the hardware
+	ldy #1
+	lda (srcptr),y : sta $feed : sta destptr+1
+	dey
+	lda (srcptr),y : sta $feed : sta destptr
 
 	pla
-
-call_shadow_data_setaddr:
-	jsr shadow_data_setaddr
-
 	ldx srcptr : ldy srcptr+1
+
+	cmp #4  ; 4 means run
+	bne return
+
+	ldx destptr : ldy destptr+1
+	lda #SCMD_CALL
+	jmp shadow_command
+
+return:
 	rts
 .)
 
@@ -92,19 +97,16 @@ skiptonextzeroloop:
 noreloc:
 	; Set up the data transfer
 	ldx destptr : ldy destptr+1
-	lda #1 : jsr shadow_data_setaddr
+	sty $feed : stx $feed
 
 	; Send the bytes
 	ldx #$00 : stx srcptr
 	ldx #$80 : stx srcptr+1
 	ldx #$40 : ldy #$00
 copyloop:
-	lda (srcptr),y : jsr shadow_data_byte
+	lda (srcptr),y : sta $fee5
 	iny : bne copyloop
 	inc srcptr+1 : dex : bne copyloop
-
-	; Disable the data transfer
-	lda #$80 : jsr shadow_data_setaddr
 
 	; Enter the language
 	ldx destptr : ldy destptr+1

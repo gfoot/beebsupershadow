@@ -4,36 +4,18 @@ copy_to_normal:
 	; from shadow memory pointed at by srcptr
 	; to normal memory pointed at by destptr
 
-    ; This is the direct opposite of copy_to_shadow.  We will go into shadow-read,
-    ; normal-write mode, and most code won't work in that mode, so disable interrupts.
-    ;
-    ; NMIs are OK because they immediately switch into normal-read, normal-write mode -
-    ; but we need to make sure they switch back to the right mode when they return
+	; We actually do this by entering normal mode and telling it to do the
+    ; copy in the reverse direction.
 
-	; Disable normal interrupts
-	php
-	sei
+	; Set the source address in the hardware
+	lda srcptr+1 : sta $feed
+	lda srcptr : sta $feed
 
-    ; Mark that we're switching to shadow_read_normal_write mode, so that if an NMI occurs
-    ; the handler will know to switch back to this mode when it's finished
-    lda #$80
-    sta shadow_read_normal_write_flag
-	jsr shadow_read_normal_write
+	; Put the number of bytes in A, with YYXX pointing to the target address
+	tya : ldx destptr : ldy destptr+1
 
-	dey
-loop:
-	lda (srcptr),y : sta (destptr),y
-	dey
-	cpy #$ff
-	bne loop
-
-again:
-	; Return to pure shadow mode, clearing the flag
-	jsr shadow_read_normal_write_off
-
-	; Restore the processor flags and return to caller
-	plp
-	rts
+	; Chain to the normal-mode routine
+	jmp normal_copy_from_shadow
 .)
 
 

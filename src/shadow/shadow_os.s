@@ -5,9 +5,11 @@
 ; It lives at $f800, like the Tube's OS does, provides the CPU's interrupt and reset 
 ; vectors when in shadow mode, and also owns $0090-$00ff and $0200-$03ff.
 
-shadow_code_source:
+shadow_os_source_start:
+
+shadow_os_low_source:
 	*=$f800
-shadow_code_dest:
+shadow_os_low_dest:
 
 .(
 
@@ -25,13 +27,16 @@ shadow_code_dest:
 #include "shadow/shadow_osfind.s"
 #include "shadow/shadow_osargs.s"
 #include "shadow/shadow_osgbpb.s"
-#include "shadow/shadow_datatrans.s"
 #include "shadow/shadow_event.s"
 #include "shadow/shadow_entercode.s"
 
+&shadow_os_low_end:
+&shadow_os_low_size = * - shadow_os_low_dest
+* = shadow_os_low_source + shadow_os_low_size
 
-padding:
-    .dsb $ff00-*, $00
+&shadow_os_high_source:
+	* = $ff00
+&shadow_os_high_dest:
 
 #include "shadow/shadow_osbyte.s"
 #include "shadow/shadow_utils.s"
@@ -41,7 +46,9 @@ padding:
 
 .)
 
-shadow_code_size = *-shadow_code_dest
-* = shadow_code_source + shadow_code_size
-shadow_code_source_end:
+shadow_os_high_end:
+shadow_os_high_size = *-shadow_os_high_dest
+* = shadow_os_high_source + shadow_os_high_size
+
+shadow_os_source_end:
 
