@@ -11,6 +11,9 @@
     rts
 
 secondtime:
+    ; Explode the character set
+    lda #$14 : ldx #$06 : jsr osbyte
+
     ; Tell the shadow side what happened
     lda #SCMD_REBOOT
     jsr shadow_command    
