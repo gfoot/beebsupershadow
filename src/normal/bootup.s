@@ -37,6 +37,12 @@
     ;jsr printimm
     ;.byte "SuperShadow starting", 13, 0
 
+	; Attempt to detect presence of SuperShadow V2 hardware
+	jsr detect_hardware
+	bcc hardware_ok
+	rts
+
+hardware_ok:
 	; Relocate the long-term normal mode host code into the language workspace
 	ldy #0
 loop3:
@@ -99,7 +105,9 @@ loop:
 	jsr $fff4
 	lda #247 : ldy #0 : ldx #$4c
 	jsr $fff4
-
+	
+	; Clear carry to indicate success
+	clc
 	rts
 
 
@@ -117,4 +125,32 @@ loop:
 .)
 
 .)
+
++detect_hardware:
+.(
+	pha
+	lda #$03 : sta $feed : sta $feed
+	lda #$2f : sta $fee5
+	lda #$84 : sta $fee5
+	lda #$03 : sta $feed : sta $feed
+	lda $fee5 : cmp #$2f : bne nope
+	lda $fee5 : cmp #$84 : bne nope
+	lda #$03 : sta $feed : lda #$04 : sta $feed
+	lda $fee5 : cmp #$84 : bne nope
+
+	; Clear carry to indicate success
+	clc
+	pla
+	rts
+
+nope:
+	; Set carry to indicate failure
+	sec
+	pla
+	rts
+.)
+
+; Only call this if you're sure the ROM is paged in
++nprintimm:
+	jmp printimm
 
