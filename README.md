@@ -26,21 +26,43 @@ https://stardot.org.uk/forums/viewtopic.php?f=3&t=26191
 
 # Status
 
-This is an early prototype.  This repository contains the Shadow OS code, as
-part of a normal-mode executable that bootstraps it.  It installs various
-routines in Shadow RAM, and runs some tests of the OS entry points.
+## V1
 
-Most things work pretty well at this stage, including interrupts, and it ought
-to be able to run BASIC or HIBASIC now.
+V1 was an early prototype, initially using an executable file to bootstrap but
+later using a ROM image as an alternative option.  It installs various
+routines in Shadow RAM, including a Shadow OS, and presents a Tube-like
+environent which is good enough for HiBasic and View to run.
+
+V1 was primitive and required a patched DNFS ROM for file loading and saving
+to work.
+
+## V2
+
+V2 is an enhancement which adds hardware support for one of the Tube I/O
+addresses.  This makes transferring data between modes safer, and allows
+Tube-aware filing systems like DNFS to work without being patched.
+
+## Hardware
 
 Obviously it also requires hardware support, it won't work on a stock BBC
-Micro.  I've designed a small shadow RAM board that plugs into the processor
+Micro.  For V1 I designed a small shadow RAM board that plugs into the processor
 socket, providing the 64K of RAM through two 32K static RAM chips, with a PLD
 and another glue logic IC to implement the simple bank switching protocol.
 This is untested so far.
 
-I've also patched BeebEm to add support for this mode, and that's what I've
-been using to test the code so far.  If you have the tools to build it, you can get that here:
+Similarly for V2 I have designed a slightly larger board that provides
+hardware support for one of the Tube registers - again the hardware is
+untested.
+
+## Emulation
+
+To allow for software development, in lieu of having actual hardware I've
+patched BeebEm to add support for these modes, and that's what I've been using
+to test the code so far.  If you have the tools to build it, you can get that
+here:
+
 https://github.com/gfoot/beebem-windows/tree/supershadow
 
+Set the variable SuperShadowVersion to 1 or 2 to choose between V1 and V2
+modes.
 
