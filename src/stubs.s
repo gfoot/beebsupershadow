@@ -80,6 +80,7 @@ normal_brk:
 normal_irq:
     ; Allow the interrupt to retrigger in normal mode
     cli
+	nop ; we need to idle here as the CPU won't process the interrupt immediately
 
     ; Switch back to shadow mode and return from the outer IRQ
     jmp shadow_rti

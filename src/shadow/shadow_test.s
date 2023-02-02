@@ -3,6 +3,8 @@ shadow_test:
     jsr printimm
     .byte "Testing OS calls from shadow code", 13, 0
 
+	php : cli
+
     jsr osnewl
 
     jsr printimm
@@ -16,6 +18,9 @@ shadow_test:
     jsr test_osword01
     jsr test_osword07
 
+	jsr test_pressspace
+
+	plp
     rts
 
 
@@ -114,6 +119,11 @@ notpressed:
     .byte "Too slow!", 0
 
 next:
+    jmp osnewl
+.)
+
+test_pressspace:
+.(
     jsr printimm
     .byte 13, "   Press SPACE to continue...", 0
 

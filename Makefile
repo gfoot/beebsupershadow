@@ -1,12 +1,14 @@
 SOURCES = $(wildcard src/*.s) $(wildcard src/*/*.s)
 
-all: bin/supshad.x bin/supshad.x.inf bin/supershadow.rom dnfs/supdnfs.rom
+all: bin/SUPSHAD bin/SUPSHAD.inf bin/supershadow.rom dnfs/supdnfs.rom bin/SSTEST
 
+TARG = ../serial/serialfs/storage/DEFAULT
+deploy: $(TARG)/SSTEST $(TARG)/SSTEST.inf $(TARG)/SUPSHAD $(TARG)/SUPSHAD.inf
 
-bin/supshad.x labels/supshad.labels: $(SOURCES)
-	xa -o bin/supshad.x src/main.s -I src -DSTANDALONE -l labels/supshad.labels
+bin/SUPSHAD labels/supshad.labels: $(SOURCES)
+	xa -o bin/SUPSHAD src/main.s -I src -DSTANDALONE -l labels/supshad.labels
 
-bin/supshad.x.inf: py/writeinf.py py/parsesyms.py labels/supshad.labels
+bin/SUPSHAD.inf: py/writeinf.py py/parsesyms.py labels/supshad.labels
 	python py/writeinf.py labels/supshad.labels $@
 
 bin/supershadow.rom labels/supershadow.rom.labels: $(SOURCES)
@@ -15,4 +17,10 @@ bin/supershadow.rom labels/supershadow.rom.labels: $(SOURCES)
 dnfs/supdnfs.rom: dnfs/patch_dnfs.py dnfs/dnfs.rom
 	(cd dnfs && python patch_dnfs.py)
 
+
+bin/SSTEST: testsrc/test.s
+	xa -o $@ $<
+
+$(TARG)/% : bin/%
+	cp $< $@
 
