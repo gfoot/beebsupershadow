@@ -16,6 +16,8 @@ service_entry:
 .(
     cmp #$fe : beq post_tube
 	cmp #$09 : beq help
+	cmp #$0d : beq rfs_init
+	cmp #$0e : beq rfs_bget
     rts
 
 post_tube:
@@ -40,6 +42,12 @@ skip_init:
     pla : tay : pla : tax : pla
     rts
 
+rfs_init:
+	jmp do_rfs_init
+
+rfs_bget:
+	jmp do_rfs_bget
+
 help:
 	lda ($f2),y
 	cmp #13
@@ -63,5 +71,31 @@ skiphelp:
 	lda #9
 	rts
 
+.)
+
+.(
+&do_rfs_init:
+	pha
+	tya : eor #15 : cmp $f4 : bcc passon
+
+	lda #<rfs_data : sta $f6
+	lda #>rfs_data : sta $f7
+	lda $f4 : eor #15 : sta $f5
+	bpl claim
+
+&do_rfs_bget:
+	pha
+	lda $f5 : eor #15 : cmp $f4 : bne passon
+	ldy #0 : lda ($f6),y : tay
+	inc $f6 : bne claim
+	inc $f7
+
+claim:
+	pla : lda #0
+	rts
+
+passon:
+	pla
+	rts
 .)
 

@@ -21,4 +21,7 @@
 ; Check some values make sense
 #include "asserts.s"
 
+rfs_data:
+	.byte '+'
+
 loadend:
