@@ -3,7 +3,13 @@ SOURCES = $(wildcard src/*.s) $(wildcard src/*/*.s)
 all: bin/SUPSHAD bin/SUPSHAD.inf bin/supershadow.rom dnfs/supdnfs.rom bin/SSTEST
 
 TARG = ../serial/serialfs/storage/DEFAULT
-deploy: $(TARG)/SSTEST $(TARG)/SSTEST.inf $(TARG)/SUPSHAD $(TARG)/SUPSHAD.inf
+
+DEPLOYS = $(TARG)/SSTEST $(TARG)/SSTEST.inf
+DEPLOYS += $(TARG)/SSTESTX $(TARG)/SSTESTX.inf
+DEPLOYS += $(TARG)/SUPSHAD $(TARG)/SUPSHAD.inf
+
+deploy: $(DEPLOYS)
+
 
 bin/SUPSHAD labels/supshad.labels: $(SOURCES)
 	xa -o bin/SUPSHAD src/main.s -I src -DSTANDALONE -l labels/supshad.labels
@@ -24,3 +30,5 @@ bin/SSTEST: testsrc/test.s
 $(TARG)/% : bin/%
 	cp $< $@
 
+bin/SSTESTX: testsrc/test1x.s
+	xa -o $@ $<
