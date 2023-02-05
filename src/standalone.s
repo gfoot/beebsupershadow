@@ -5,6 +5,11 @@ loadaddr:
 ; stages in the ROM version
 execaddr:
 .(
+	; Unlock shadow mode - the user explicitly requested we enter it
+	sei
+	sta $e000 : sta $d000 : sta $e000 : sta $c000
+	; Leave interrupts disabled for now
+
 	jsr bootup
 
     ;jsr printimm
@@ -24,6 +29,11 @@ execaddr:
 	ldy #>cmd_disc
 	jsr oscli
 
+	; Run the tests
+	;ldx #<cmd_shatest
+	;ldy #>cmd_shatest
+	;jsr oscli
+
 	; Read currently-active language ROM number into X
 	lda #$fc : ldx #0 : ldy #$ff : jsr osbyte
 
@@ -39,5 +49,8 @@ hang:
 	
 cmd_disc:
 	.byte "DISC", 13
+
+cmd_shatest:
+	.byte "SHATEST", 13
 .)
 

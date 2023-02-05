@@ -14,8 +14,8 @@
 #endif
 
 
-#if normal_stubs_end > $40
-#echo ERROR: Normal stubs extend beyond $40
+#if normal_stubs_end > $80
+#echo ERROR: Normal stubs extend beyond $80
 #print normal_stubs_end
 	jmp builderror
 #endif

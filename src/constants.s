@@ -24,17 +24,14 @@ SCMD_CALL = 1
 SCMD_ENTERLANG = 2
 SCMD_REBOOT = 3
 SCMD_REENTERLANG = 4
-SCMD_SETESCAPEFLAG = 5
 
 
 ; Lowest ZP location used for shadow variables
 shadow_zpvars = $e0
 
-; Buffers for shadow-to-normal transfers
-normal_inbuffer = $700
-
-; Buffers for normal-to-shadow transfers
-shadow_inbuffer = $300
+; Transfer buffer address in normal and shadow modes
+normal_transfer_buffer = $700
+shadow_transfer_buffer = $300
 
 
 

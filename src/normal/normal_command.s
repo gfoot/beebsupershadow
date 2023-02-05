@@ -49,8 +49,8 @@ jsr_instr:
 .)
 
 do_cli:
-    ldx #<normal_inbuffer
-    ldy #>normal_inbuffer
+    ldx #<normal_transfer_buffer
+    ldy #>normal_transfer_buffer
     jsr oscli
     jmp shadow_rts
 
@@ -82,10 +82,6 @@ do_file_impl:
 	tsx
 	lda $0105,x
 	
-	; Set the filename pointer in the stacked parameter block to point to the inbuffer
-	ldx #<normal_inbuffer : stx $0100
-	ldx #>normal_inbuffer : stx $0101
-
 	; Set XY to point to the stacked parameter block and call OSFILE
 	ldx #$00 : ldy #$01
 	jsr osfile

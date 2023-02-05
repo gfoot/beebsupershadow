@@ -19,14 +19,21 @@ lang_ws_source:
 lang_ws_dest:
 
 #include "normal/normal_entrypoints.s"
-
-#include "normal/copytoshadow.s"
 #include "normal/normal_interrupts.s"
+#include "normal/normal_event.s"
+&lang_ws_low_end
+
+	.dsb $4c0-*, $00
+
+#include "shadow_stubs.s"
+	.dsb $500-*, $00
+
+&lang_ws_high_start
+
 #include "normal/normal_command.s"
 #include "normal/normal_cmd_osword.s"
 #include "normal/normal_brk.s"
 #include "normal/normal_breakhandler.s"
-#include "normal/normal_event.s"
 
 &lang_ws_end:
 

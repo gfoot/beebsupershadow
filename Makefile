@@ -7,6 +7,8 @@ TARG = ../serial/serialfs/storage/DEFAULT
 DEPLOYS = $(TARG)/SSTEST $(TARG)/SSTEST.inf
 DEPLOYS += $(TARG)/SSTESTX $(TARG)/SSTESTX.inf
 DEPLOYS += $(TARG)/SUPSHAD $(TARG)/SUPSHAD.inf
+DEPLOYS += $(TARG)/SHATEST $(TARG)/SHATEST.inf
+DEPLOYS += $(TARG)/SSOFF $(TARG)/SSOFF.inf
 
 deploy: $(DEPLOYS)
 
@@ -32,3 +34,13 @@ $(TARG)/% : bin/%
 
 bin/SSTESTX: testsrc/test1x.s
 	xa -o $@ $<
+	echo '$$.SSTESTX     ffff2000 ffff2000' > $@.inf
+
+bin/SHATEST: testsrc/shatest.s
+	xa -o $@ $<
+	echo '$$.SHATEST     00002000 00002000' > $@.inf
+
+bin/SSOFF: testsrc/ssoff.s
+	xa -o $@ $<
+	echo '$$.SSOFF       ffff2000 ffff2000' > $@.inf
+

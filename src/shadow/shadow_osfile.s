@@ -27,9 +27,9 @@ loop:
 	dey : bpl loop
 
 	; Copy the filename to the inbuffer
-	ldx $0100
-	ldy $0101
+	ldx $0100 : ldy $0101
 	jsr copy_xy_string_to_normal
+	stx $0100 : sty $0101
 
 	lda #CMD_OSFILE
 	jsr normal_command

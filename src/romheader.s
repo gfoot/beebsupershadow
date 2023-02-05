@@ -25,8 +25,6 @@ service_entry:
 post_tube:
     pha : txa : pha : tya : pha
 
-    jsr bootup
-
     ; Check for soft-boot
 	lda #$fd : ldx #$00 : ldy #$ff
 	jsr osbyte
@@ -34,6 +32,14 @@ post_tube:
 	beq skip_init
 
     ; If it's not a soft boot, we want to perform first-time initialisation
+
+	; Check if shadow mode has been locked - if so, don't try to use it
+	jsr check_if_locked
+	bcc skip_init
+
+	; Continue initialisation
+    jsr bootup
+
     lda #SCMD_INIT
     jsr shadow_command
 skip_init:
@@ -41,6 +47,43 @@ skip_init:
     pla : tay : pla : tax : pla
     rts
 .)
+
+
+; Returns with carry set if shadow mode is available, clear if it is locked
+check_if_locked:
+.(
+	; These zero-page locations are corrupted by the test
+	n_rts = $3f
+	s_sec = $f8
+
+	php : sei
+
+	; Set up a "normal rts" stub
+	lda #$60 : sta n_rts
+	
+	; Set up a fake "shadow sec" stub that doesn't set the carry
+	sta s_sec
+
+	; Set up the real "shadow sec" stub
+	lda #$38    : sta $400+s_sec    ; sec
+	lda #$4c    : sta $400+s_sec+1  ; jmp
+	lda #<n_rts : sta $400+s_sec+2  ; <n_rts
+	lda #>n_rts : sta $400+s_sec+3  ; >n_rts
+
+	; Call it and check the carry flag
+	clc
+	jsr s_sec
+
+	; Save the carry
+	rol n_rts
+
+	; Restore flags for interrupt state, restore carry, and exit
+	plp
+	ror n_rts
+	rts
+.)
+
+
 
 .(
 &rfs_init:

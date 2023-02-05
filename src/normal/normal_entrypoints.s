@@ -117,9 +117,9 @@ copyloop:
 
 syncescape:
 .(
-	lda #SCMD_SETESCAPEFLAG
 	ldx $ff
-	jmp shadow_command
+	stx $04ff
+	rts
 .)
 
 .)

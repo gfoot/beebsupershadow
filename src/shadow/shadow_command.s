@@ -9,7 +9,6 @@
 	cmp #SCMD_ENTERLANG : beq do_enterlang
 	cmp #SCMD_REBOOT : beq do_reboot
 	cmp #SCMD_REENTERLANG : beq do_reenterlang
-	cmp #SCMD_SETESCAPEFLAG : beq do_setescapeflag
 
     brk
     .db $fa, "Unknown command", 0
@@ -40,11 +39,6 @@ do_call:
 
 do_reboot:
 	jmp shadow_reboot
-
-do_setescapeflag:
-	stx escapeflag
-	jmp normal_rts
-
 .)
 
 

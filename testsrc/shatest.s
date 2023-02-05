@@ -1,3 +1,14 @@
+	* = $2000
+
+print_ptr = $40
+osasci = $ffe3
+oswrch = $ffee
+osnewl = $ffe7
+osword = $fff1
+osbyte = $fff4
+
+buffer = $1f00
+
 shadow_test:
 .(
     jsr printimm
@@ -39,18 +50,19 @@ test_osword00:
     jsr printimm
     .byte "   You typed: ", 0
 
-    lda #0 : sta print_ptr
-    lda #$20 : sta print_ptr+1
+    lda osw00params : sta print_ptr
+    lda osw00params+1 : sta print_ptr+1
     lda #0 : sta (print_ptr),y
     jsr print
     jmp osnewl
 
 cancelled:
     jsr printimm
-    .byte "Cancelled, did you press Escape?", 13, 0
+    .byte 13,"   Cancelled, did you press Escape?", 13, 0
+	rts
 
 osw00params:
-    .word $2000
+    .word buffer
     .byte $40
     .byte 0,$ff
 .)
@@ -60,14 +72,14 @@ test_osword01:
     jsr printimm
     .byte "OSWORD 01 - TIME=&", 0
 
-    ldx #0
-    ldy #$20
+    ldx #<buffer
+    ldy #>buffer
     lda #1
     jsr osword
 
     ldx #4
 loop:
-    lda $2000,x
+    lda buffer,x
     jsr printhex
     dex
     bpl loop
@@ -156,4 +168,6 @@ test_osbyte8384:
 .)
 
 .)
+
+#include "src/common/utils.s"
 

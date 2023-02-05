@@ -1,23 +1,35 @@
 ; Bootup code for Super Shadow RAM
 ;
-; We start in N/N mode (normal read, normal write)
+; We start in Normal mode where reads and writes come from normal beeb memory.
+; We can switch into a shadow mode where they instead use shadow memory.
+; 
+; There are some exceptions - normal writes to $F800-$FFFF also write shadow memory, 
+; and three memory regions are mapped to the same physical RAM between modes:
+;
+;       Shadow         Normal
+;    $00C0-$00FF    $04C0-$04FF
+;    $0100-$01FF    $0100-$01FF
+;    $0300-$03FF    $0700-$07FF
 ;
 ; Mode changes occur as a side effect of executing code in page zero.
 ;
-; If A7 is set, then reads come from shadow memory.  If A6 is set then writes go to
-; shadow memory.  Stack accesses always use shadow memory, so that portion of the
-; normal memory is unused.
+; If A7 is set, then shadow mode is activated; otherwise normal mode is activated.
 ;
-; Typically you want A6=A7 - i.e. execute some code in the range 00-3F, or C0-FF.  Then
-; writes go to the same place that reads come from.  However, after startup we can't
-; just switch to shadow mode because there's nothing in the RAM - so we need to transfer
-; some boot code and other things to get things started.
+; There's also a locking mechanism - writing to $Exxx while in normal mode will lock 
+; the system in normal mode until consecutive writes occur to $Dxxx, $Exxx, and $Cxxx.
+; While locked, executing code from zero page will have no effect on the active mode.
+; Writing another address during the unlock sequence will cancel it.
 ;
-; Thus the bootup code here, running in N/N mode, will switch to N/S mode - so that reads
-; (including code) come from normal memory and writes go to shadow memory - and copy code 
-; to the shadow RAM.
+; Our first job is to unlock shadow mode, and populate some areas of shadow RAM.  The
+; shadow OS lives a $F800, and we also need to provide some entry points in shadow 
+; zero page - trampolines that cause switches into shadow mode and execute shadow OS
+; routines.
 ;
-; Then it can switch to shadow mode and the code there takes control overall.
+; We also need to provide similar trampolines for returning from shadow mode.
+;
+; In general once everything is set up we switch to shadow mode and let Shadow OS take
+; over - the normal mode code then just stays resident to serve I/O requests from 
+; shadow mode.
 ;
 ; Interrupts can be serviced in either mode.  Minimally, the shadow mode reflects them
 ; back into normal mode; but it'd also be possible to allow user code on the shadow side
@@ -31,6 +43,7 @@
     ;.byte "SuperShadow starting", 13, 0
 
 	; Relocate the long-term normal mode host code into the language workspace
+	; As this writes to $04C0-$04FF, this automatically installs the shadow stubs
 	ldy #0
 loop3:
 	lda lang_ws_source,y : sta lang_ws_dest,y
@@ -53,38 +66,38 @@ loop:
 	dey
 	bpl loop
 
-	; Set up the "normal read, shadow write" stub, containing an RTS instruction
-	lda #$60
-	sta `normal_read_shadow_write
-
     ;jsr printimm
-    ;.byte "Installing shadow stubs", 13, 0
+    ;.byte "Uploading shadow OS", 13, 0
 
-	; Copy the shadow stubs into shadow zero page ready for use
-	lda #<shadow_stubs_source : sta srcptr
-	lda #>shadow_stubs_source : sta srcptr+1
-	lda #<shadow_stubs_dest : sta destptr
-	lda #>shadow_stubs_dest : sta destptr+1
-	ldy #shadow_stubs_size
-	jsr copy_to_shadow
-
-    ;jsr printimm
-    ;.byte "Uploading shadow OS ", 13, 0
-
-	; Copy the main shadow code image to shadow memory
-	lda #<shadow_code_source : sta srcptr
-	lda #>shadow_code_source : sta srcptr+1
-	lda #<shadow_code_dest : sta destptr
-	lda #>shadow_code_dest : sta destptr+1
-
-	ldx #>(shadow_code_size+255)
-	ldy #<shadow_code_size
-
-loop2:
-	jsr copy_to_shadow
+	; Copy the low shadow code image to shadow memory
+	lda #<shadow_code_low_source : sta srcptr
+	lda #>shadow_code_low_source : sta srcptr+1
+	lda #<shadow_code_low_dest : sta destptr
+	lda #>shadow_code_low_dest : sta destptr+1
+	
+	ldy #0
+loop2a:
+	lda (srcptr),y : sta (destptr),y
+	iny : bne loop2a
 	inc srcptr+1 : inc destptr+1	
-	iny ; to 0 which means 256 bytes
-	dex : bne loop2
+	lda srcptr+1 : cmp #>shadow_code_low_source_end : bne loop2a
+
+	; Copy the high shadow code image to shadow memory
+	lda #<shadow_code_high_source : sta srcptr
+	lda #>shadow_code_high_source : sta srcptr+1
+	lda #<shadow_code_high_dest : sta destptr
+	lda #>shadow_code_high_dest : sta destptr+1
+	
+	ldy #0
+loop2b:
+	lda (srcptr),y : sta (destptr),y
+	iny : bne loop2b
+	inc srcptr+1 : inc destptr+1	
+	lda srcptr+1 : cmp #>shadow_code_high_source_end : bne loop2b
+
+
+    ;jsr printimm
+    ;.byte "Install BREAK handler", 13, 0
 
 	; Install our reset intercept, to automatically reenable things when Break is pressed
 	lda #248 : ldy #0 : ldx #<normal_breakhandler
