@@ -110,3 +110,9 @@ loop2b:
 	rts
 .)
 
+
+; Only call this if you're sure the ROM is paged in
++nprintimm:
+       jmp printimm
+
+
