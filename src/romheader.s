@@ -25,47 +25,10 @@ star:
 	jmp starcommand
 
 post_tube:
-    pha : txa : pha : tya : pha
-
-    ; Check for soft-boot
-	lda #$fd : ldx #$00 : ldy #$ff
-	jsr osbyte
-	cpx #0
-	beq skip_init
-
-    ; If it's not a soft boot, we want to perform first-time initialisation
-
-	; Check if shadow mode has been locked - if so, don't try to use it
-	jsr check_if_locked
-	bcc skip_init
-
-	; Continue initialisation
-    jsr bootup
-
-    lda #SCMD_INIT
-    jsr shadow_command
-skip_init:
-
-    pla : tay : pla : tax : pla
-    rts
+	jmp do_post_tube
 
 help:
-.(
-	lda ($f2),y
-	cmp #13
-	bne skiphelp
-
-	jsr nprintimm
-	.byte 13, "SuperShadow V1X service ROM"
-	.byte 13, "  SSON"
-	.byte 13, "  SSOFF"
-	.byte 13, 0
-
-skiphelp:
-	lda #9
-	rts
-.)
-
+	jmp do_help
 
 .(
 &rfs_init:
@@ -92,6 +55,51 @@ passon:
 	pla
 	rts
 .)
+
+do_post_tube:
+.(
+    pha : txa : pha : tya : pha
+
+    ; Check for soft-boot
+	lda #$fd : ldx #$00 : ldy #$ff
+	jsr osbyte
+	cpx #0
+	beq skip_init
+
+    ; If it's not a soft boot, we want to perform first-time initialisation
+
+	; Check if shadow mode has been locked - if so, don't try to use it
+	jsr check_if_locked
+	bcc skip_init
+
+	; Continue initialisation
+    jsr bootup
+
+    lda #SCMD_INIT
+    jsr shadow_command
+skip_init:
+
+    pla : tay : pla : tax : pla
+    rts
+.)
+
+do_help:
+.(
+	lda ($f2),y
+	cmp #13
+	bne skiphelp
+
+	jsr nprintimm
+	.byte 13, "SuperShadow V1X service ROM"
+	.byte 13, "  SSON"
+	.byte 13, "  SSOFF"
+	.byte 13, 0
+
+skiphelp:
+	lda #9
+	rts
+.)
+
 
 .)
 
