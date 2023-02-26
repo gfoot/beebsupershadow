@@ -1,6 +1,6 @@
 SOURCES = $(wildcard src/*.s) $(wildcard src/*/*.s)
 
-TESTPROGS = SSTEST SSTESTX SHATEST
+TESTPROGS = SSTEST SSTESTX SSTEST2 SHATEST
 
 PROGS = SUPSHAD SSOFF $(TESTPROGS)
 
@@ -39,6 +39,10 @@ bin/SSTEST: testsrc/test.s
 bin/SSTESTX: testsrc/test1x.s
 	xa -o $@ $<
 	echo '$$.SSTESTX     ffff2000 ffff2000' > $@.inf
+
+bin/SSTEST2: testsrc/test2.s
+	xa -o $@ $<
+	echo '$$.SSTEST2     ffff2000 ffff2000' > $@.inf
 
 bin/SHATEST: testsrc/shatest.s
 	xa -o $@ $<
