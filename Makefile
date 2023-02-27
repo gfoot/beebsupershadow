@@ -28,6 +28,10 @@ dnfs/supdnfs.rom: dnfs/patch_dnfs.py dnfs/dnfs.rom
 	(cd dnfs && python patch_dnfs.py)
 
 
+burn: bin/supershadow.rom
+	minipro -p AT28C64B -w bin/supershadow.rom -s
+
+
 $(TARG)/% : bin/%
 	cp $< $@
 
