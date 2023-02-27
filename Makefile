@@ -21,8 +21,13 @@ bin/SUPSHAD labels/supshad.labels: $(SOURCES)
 bin/SUPSHAD.inf: py/writeinf.py py/parsesyms.py labels/supshad.labels
 	python py/writeinf.py labels/supshad.labels $@
 
-bin/supershadow.rom labels/supershadow.rom.labels: $(SOURCES)
-	xa -o bin/supershadow.rom src/main.s -I src -l labels/supershadow.rom.labels
+
+EMBED_FILES = bin/SHATEST bin/SSOFF embedfiles/LANGTST embedfiles/PLOTTST embedfiles/STRESS
+
+bin/supershadow.rom labels/supershadow.rom.labels: $(SOURCES) $(EMBED_FILES)
+	xa -o bin/temp.rom src/main.s -I src -l labels/supershadow.rom.labels
+	python py/addromfile.py bin/temp.rom $(EMBED_FILES)
+	mv out.rom bin/supershadow.rom
 
 dnfs/supdnfs.rom: dnfs/patch_dnfs.py dnfs/dnfs.rom
 	(cd dnfs && python patch_dnfs.py)
