@@ -83,7 +83,7 @@ settransaddr:
 	sty $feed
 
 	; Issue 1 hack
-	pha : tya : asl : asl : asl : asl : sta $feed : pla
+	/*pha : tya : asl : asl : asl : asl : sta $feed : pla*/
 
 	stx $feed
 	rts
