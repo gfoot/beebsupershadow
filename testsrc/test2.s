@@ -9,6 +9,9 @@ entry:
 
 	sei
 
+	; But before anything else, make sure the system is not locked
+	sta $e000 : sta $d000 : sta $e000 : sta $c000
+
 	jsr test1
 	jsr test2
 	jsr test3

@@ -33,7 +33,7 @@ passthrough:
 cmd_help:
 .(
 	jsr printimm
-	.byte 13, "SuperShadow OS 0.21", 13, "  for V2 hardware", 13, 0
+	.byte 13, "SuperShadow OS 0.22 (V2/V4)", 13, 0
 
 	jmp passthrough
 .)

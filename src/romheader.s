@@ -64,12 +64,12 @@ help:
 	bne skiphelp
 
 	jsr nprintimm
-	.byte 13, "SuperShadow service ROM for V2 hardware", 13, 0
+	.byte 13, "SuperShadow service ROM 0.22 (V2/V4)", 13, 0
 
 	jsr detect_hardware
 	bcc detected
 	jsr nprintimm
-	.byte "  V2 hardware not detected", 13, 0
+	.byte "  Hardware not detected", 13, 0
 	jmp skiphelp
 
 detected:
