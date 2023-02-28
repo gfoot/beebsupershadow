@@ -129,12 +129,15 @@ loop:
 +detect_hardware:
 .(
 	pha
+	lda #$ff : sta $feed ; guard against V2 Issue 1...
 	lda #$03 : sta $feed : sta $feed
 	lda #$2f : sta $fee5
 	lda #$84 : sta $fee5
+	lda #$ee : sta $feed ; ... by using different...
 	lda #$03 : sta $feed : sta $feed
 	lda $fee5 : cmp #$2f : bne nope
 	lda $fee5 : cmp #$84 : bne nope
+	lda #$dd : sta $feed ; ... values each time
 	lda #$03 : sta $feed : lda #$04 : sta $feed
 	lda $fee5 : cmp #$84 : bne nope
 
