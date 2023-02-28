@@ -58,19 +58,16 @@ help:
 	bne skiphelp
 
 	jsr nprintimm
-	.byte 13, "SuperShadow service ROM", 13
-	.byte "        V2 hardware ", 0
+	.byte 13, "SuperShadow service ROM for V2 hardware", 13, 0
 
 	jsr detect_hardware
 	bcc detected
-
 	jsr nprintimm
-	.byte "not ", 0
+	.byte "  V2 hardware not detected", 13, 0
+	jmp skiphelp
 
 detected:
 	jsr nprintimm
-	.byte "present", 13
-
 	.byte "  SSON", 13
 	.byte "  SSOFF", 13
 	.byte 0
@@ -145,91 +142,19 @@ passon:
 	lda #4
 	rts
 
-star_sson:
+
 .(
-	; Unlock shadow mode
-	sei
-	sta $e000 : sta $d000 : sta $e000 : sta $c000
-	; Leave interrupts disabled for now
+&star_sson:
+	jsr sson
+	jmp init_fs_enter_language
 
-	; Boot up and initialise shadow OS
-	jsr bootup
+&star_ssoff:
+	jsr ssoff
+	jmp init_fs_enter_language
 
-    ;jsr printimm
-    ;.byte "Initialising shadow OS", 13, 13, 0
-
-	jsr $ffe7
-
-	; Send the initialisation command
-	lda #SCMD_INIT
-	jsr shadow_command
-
-	; Chain to the post-Break handler to do the things that normally happen during reset -
-	; hooking vectors with routines to pass them to Shadow mode, etc
-	sec ; it only acts when the carry is set
-	jsr normal_breakhandler
-
-	; Issue a *DISC command so that DNFS reinitialises with its Tube support enabled
-	ldx #<cmd_disc : ldy #>cmd_disc
-	jsr do_oscli
-
-	; Read currently-active language ROM number into X
-	lda #$fc : ldx #0 : ldy #$ff : jsr osbyte
-
-	; Reactivate the language ROM specified by X, causing it to get copied to shadow
-	; RAM and executed there
-	lda #$8e : jsr osbyte
-	
-    ; If it returns somehow, we can't really carry on as we've corrupted BASIC's 
-	; zero page and set weird vectors, so reboot.
-	jmp ($fffc)
-	
-cmd_disc:
-	.byte "DISC", 13
-.)
-
-star_ssoff:
-.(
-	sei
-
-	; Disable shadow mode
-	sta $e000
-
-	; Restore OS vectors
-	lda $ffb8
-	sta $f9
-	lda $ffb7
-	sta $f8
-	ldy $ffb6
-loop:
-	dey
-	lda ($f8),y : sta $0200,y
-	cpy #0 : bne loop
-
-	; Disable fake Tube
-	lda #$ea : ldx #0 : ldy #0 : jsr $fff4
-
-	; Disable BREAK intercept
-	lda #247 : ldx #0 : ldy #0 : jsr $fff4
-
-	cli
-
-	jsr nprintimm
-	.byte 13, "SuperShadow disabled", 13, 13, 0
-
-	; Reactivate filing system
-	ldx #<cmd_disc : ldy #>cmd_disc
-	jsr do_oscli
-
-	; Enter BASIC
-	ldx #<cmd_basic : ldy #>cmd_basic
-	jmp do_oscli
-
-cmd_disc:
-	.byte "DISC", 13
-
-cmd_basic:
-	.byte "B.", 13
+#include "common/ssoff.s"
+#include "common/sson.s"
+#include "common/init_fs_enter_language.s"
 .)
 
 do_oscli:

@@ -1,4 +1,5 @@
 SOURCES = $(wildcard src/*.s) $(wildcard src/*/*.s)
+COMMON = $(wildcard src/common/*.s)
 
 TESTPROGS = SSTEST SSTESTX SSTEST2 SHATEST
 
@@ -57,7 +58,7 @@ bin/SHATEST: testsrc/shatest.s
 	xa -o $@ $<
 	echo '$$.SHATEST     00002000 00002000' > $@.inf
 
-bin/SSOFF: testsrc/ssoff.s
+bin/SSOFF: testsrc/ssoff.s $(COMMON)
 	xa -o $@ $<
 	echo '$$.SSOFF       ffff2000 ffff2000' > $@.inf
 
