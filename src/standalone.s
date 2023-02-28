@@ -19,10 +19,11 @@ execaddr:
 	sec ; it only acts when the carry is set
 	jsr normal_breakhandler
 
-	; Issue a *DISC command so that DNFS reinitialises with its Tube support enabled
-	ldx #<cmd_disc
-	ldy #>cmd_disc
-	jsr oscli
+	; We need to reselect the filing system, to let it adapt to Tube presence, so we
+	; select the TAPE filing system and then issue service call 3 to select the 
+	; default filing system like on boot-up
+	lda #$8c : ldx #0 : jsr osbyte
+	lda #$8f : ldx #3 : ldy #8 : jsr osbyte
 
 	; Read currently-active language ROM number into X
 	lda #$fc : ldx #0 : ldy #$ff : jsr osbyte
@@ -36,8 +37,5 @@ execaddr:
 	; in memory at that time.
 hang:
 	jmp hang
-	
-cmd_disc:
-	.byte "DISC", 13
 .)
 

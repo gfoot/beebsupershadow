@@ -1,5 +1,10 @@
 	* = $2000
 
+osasci = $ffe3
+osnewl = $ffe7
+osbyte = $fff4
+oscli = $fff7
+
 entry:
 .(
 	sei
@@ -19,31 +24,31 @@ loop:
 	cpy #0 : bne loop
 
 	; Disable fake Tube
-	lda #$ea : ldx #0 : ldy #0 : jsr $fff4
+	lda #$ea : ldx #0 : ldy #0 : jsr osbyte
 
 	; Disable BREAK intercept
-	lda #247 : ldx #0 : ldy #0 : jsr $fff4
+	lda #247 : ldx #0 : ldy #0 : jsr osbyte
 
 	cli
 
 	ldy #$ff
 printloop:
 	iny
-	lda message,y : jsr $ffe3
+	lda message,y : jsr osasci
 	cmp #13 : bne printloop
+	jsr osnewl
 
-	; Reactivate filing system
-	ldx #<cmd_disc
-	ldy #>cmd_disc
-	jsr $fff7
+	; We need to reselect the filing system, to let it adapt to Tube presence, so we
+	; select the TAPE filing system and then issue service call 3 to select the 
+	; default filing system like on boot-up
+	lda #$8c : ldx #0 : jsr osbyte
+	lda #$8f : ldx #3 : ldy #8 : jsr osbyte
 
 	; Enter BASIC
 	ldx #<cmd_basic
 	ldy #>cmd_basic
-	jmp $fff7
+	jmp oscli
 
-cmd_disc:
-	.byte "DISC", 13
 
 cmd_basic:
 	.byte "B.", 13
