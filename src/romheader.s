@@ -33,11 +33,6 @@ rfs_bget:
 post_tube:
     pha : txa : pha : tya : pha
 
-    jsr bootup
-
-	; If carry is set, bootup failed
-	bcs skip_init
-
     ; Check for soft-boot
 	lda #$fd : ldx #$00 : ldy #$ff
 	jsr osbyte
@@ -45,6 +40,11 @@ post_tube:
 	beq skip_init
 
     ; If it's not a soft boot, we want to perform first-time initialisation
+    jsr bootup
+
+    ; If carry is set, bootup failed
+    bcs skip_init
+
     lda #SCMD_INIT
     jsr shadow_command
 skip_init:
